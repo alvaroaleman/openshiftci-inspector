@@ -23,6 +23,8 @@ CREATE TABLE jobs
 
     artifacts_url VARCHAR(255),
 
+    downloaded_build_logs VARCHAR(255) DEFAULT NULL,
+
     INDEX i_status (status)
 );
 
@@ -45,15 +47,3 @@ CREATE TABLE pulls
             ON DELETE RESTRICT,
     UNIQUE u_pulls (job_id, number, sha)
 );
-
-CREATE TABLE build_logs (
-    id          BIGINT PRIMARY KEY AUTO_INCREMENT,
-    job_id      VARCHAR(255),
-    log         LONGBLOB,
-    UNIQUE i_job_id(job_id),
-    CONSTRAINT fk_build_logs_job_id
-        FOREIGN KEY fk_build_logs_job_id(job_id)
-            REFERENCES jobs (id)
-            ON UPDATE CASCADE
-            ON DELETE RESTRICT
-)

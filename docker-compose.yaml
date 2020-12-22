@@ -13,3 +13,15 @@ services:
       MYSQL_DATABASE: inspector
       MYSQL_USER: inspector
       MYSQL_PASSWORD: inspector
+  s3:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./data/minio/:/data:rw
+    environment:
+      MINIO_ACCESS_KEY: inspector
+      MINIO_SECRET_KEY: inspector
+    command:
+    - server
+    - /data

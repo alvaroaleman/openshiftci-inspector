@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"compress/gzip"
 	"context"
 	"database/sql"
 	"encoding/json"
@@ -16,6 +15,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	_ "github.com/go-sql-driver/mysql"
 	v1 "k8s.io/api/core/v1"
 )
@@ -107,11 +110,11 @@ func fetchJobs() ([]Job, error) {
 		return nil, err
 	}
 
-	bytes, err := ioutil.ReadAll(data.Body)
+	b, err := ioutil.ReadAll(data.Body)
 	if err != nil {
 		return nil, err
 	}
-	rawJSON := strings.Replace(string(bytes[:len(bytes)-1]), "var allBuilds = ", "", 1)
+	rawJSON := strings.Replace(string(b[:len(b)-1]), "var allBuilds = ", "", 1)
 
 	jobsRaw := &map[string]interface{}{}
 	if err := json.Unmarshal([]byte(rawJSON), jobsRaw); err != nil {
@@ -137,14 +140,30 @@ func main() {
 	)
 	must(err)
 
-	//updateJobs(db)
-	//updateArtifactURLs(db)
-	updateBuildLogs(db)
+	awsConfig := &aws.Config{
+		Credentials: credentials.NewCredentials(&credentials.StaticProvider{
+			Value: credentials.Value{
+				AccessKeyID:     os.Getenv("S3_ACCESS_KEY_ID"),
+				SecretAccessKey: os.Getenv("S3_SECRET_ACCESS_KEY"),
+
+				SessionToken: "",
+				ProviderName: "",
+			},
+		}),
+		Endpoint:         aws.String(os.Getenv("S3_ENDPOINT")),
+		Region:           aws.String(os.Getenv("S3_REGION")),
+		S3ForcePathStyle: aws.Bool(os.Getenv("S3_PATH_STYLE_ACCESS") == "1"),
+	}
+	sess := session.Must(session.NewSession(awsConfig))
+	s3connection := s3.New(sess)
+	updateJobs(db)
+	updateArtifactURLs(db)
+	updateBuildLogs(db, s3connection, os.Getenv("S3_BUCKET"))
 }
 
-func updateBuildLogs(db *sql.DB) {
+func updateBuildLogs(db *sql.DB, s3Connection *s3.S3, bucketName string) {
 	res, err := db.Query(
-		"SELECT jobs.id, artifacts_url FROM jobs LEFT JOIN build_logs bl on jobs.id = bl.job_id WHERE artifacts_url IS NOT NULL AND bl.job_id IS NULL")
+		"SELECT jobs.id, artifacts_url FROM jobs WHERE downloaded_build_logs IS NULL")
 	must(err)
 
 	lock := make(chan struct{}, 10)
@@ -171,18 +190,23 @@ func updateBuildLogs(db *sql.DB) {
 			must(err)
 			must(response.Body.Close())
 
-			gzipBytes := bytes.Buffer{}
-			gzipWriter := gzip.NewWriter(&gzipBytes)
-			_, err = gzipWriter.Write(data)
+			_, err = s3Connection.PutObject(&s3.PutObjectInput{
+				ACL:           aws.String("public-read"),
+				Body:          bytes.NewReader(data),
+				Bucket:        aws.String(bucketName),
+				ContentLength: aws.Int64(int64(len(data))),
+				ContentType:   aws.String("application/octet-stream"),
+				Key:           aws.String("/" + id + "/build-log.txt"),
+			})
 			must(err)
-			must(gzipWriter.Flush())
-			must(gzipWriter.Close())
+
+			/*objectResult.
 
 			insertRes, err := db.Query(
-				"REPLACE INTO build_logs (job_id, log) VALUES (?, ?)",
-				id, gzipBytes.Bytes())
+				"UPDATE jobs SET downloaded_build_logs=? WHERE id=?",
+				id)
 			must(err)
-			must(insertRes.Close())
+			must(insertRes.Close())*/
 			<-lock
 		}()
 	}
