@@ -1,27 +1,30 @@
 ---
 version: '3.2'
 services:
-  db:
+  mysql:
     image: mysql:5.7
     ports:
       - "3306:3306"
     volumes:
-      - ./data/mysql/:/var/lib/mysql:rw
+      - mysql:/var/lib/mysql:rw
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: inspector
       MYSQL_DATABASE: inspector
       MYSQL_USER: inspector
       MYSQL_PASSWORD: inspector
-  s3:
+  minio:
     image: minio/minio
     ports:
       - "9000:9000"
     volumes:
-      - ./data/minio/:/data:rw
+      - minio:/data:rw
     environment:
       MINIO_ACCESS_KEY: inspector
       MINIO_SECRET_KEY: inspector
     command:
     - server
     - /data
+volumes:
+  mysql:
+  minio:
