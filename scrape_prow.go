@@ -141,15 +141,17 @@ func main() {
 	must(err)
 
 	awsConfig := &aws.Config{
-		Credentials: credentials.NewCredentials(&credentials.StaticProvider{
-			Value: credentials.Value{
-				AccessKeyID:     os.Getenv("S3_ACCESS_KEY_ID"),
-				SecretAccessKey: os.Getenv("S3_SECRET_ACCESS_KEY"),
+		Credentials: credentials.NewCredentials(
+			&credentials.StaticProvider{
+				Value: credentials.Value{
+					AccessKeyID:     os.Getenv("S3_ACCESS_KEY_ID"),
+					SecretAccessKey: os.Getenv("S3_SECRET_ACCESS_KEY"),
 
-				SessionToken: "",
-				ProviderName: "",
+					SessionToken: "",
+					ProviderName: "",
+				},
 			},
-		}),
+		),
 		Endpoint:         aws.String(os.Getenv("S3_ENDPOINT")),
 		Region:           aws.String(os.Getenv("S3_REGION")),
 		S3ForcePathStyle: aws.Bool(os.Getenv("S3_PATH_STYLE_ACCESS") == "1"),
@@ -158,13 +160,43 @@ func main() {
 	s3connection := s3.New(sess)
 	updateJobs(db)
 	updateArtifactURLs(db)
-	updateBuildLogs(db, s3connection, os.Getenv("S3_BUCKET"))
+
+	updateAssets(
+		db,
+		s3connection,
+		os.Getenv("S3_BUCKET"),
+		"build_log",
+		"build-log.txt",
+		"text/plain",
+	)
 }
 
-func updateBuildLogs(db *sql.DB, s3Connection *s3.S3, bucketName string) {
+func updateAssets(
+	db *sql.DB,
+	s3Connection *s3.S3,
+	bucketName string,
+	assetType string,
+	sourcePath string,
+	mimeType string,
+) {
 	res, err := db.Query(
-		"SELECT jobs.id, artifacts_url FROM jobs WHERE downloaded_build_logs IS NULL")
+		"SELECT jobs.id, artifacts_url FROM jobs LEFT JOIN assets a on jobs.id = a.job_id WHERE asset_type=?", assetType,
+	)
 	must(err)
+
+	_, err = s3Connection.GetBucketLocation(
+		&s3.GetBucketLocationInput{
+			Bucket: aws.String(bucketName),
+		},
+	)
+	if err != nil {
+		_, err = s3Connection.CreateBucket(
+			&s3.CreateBucketInput{
+				Bucket: aws.String(bucketName),
+			},
+		)
+		must(err)
+	}
 
 	lock := make(chan struct{}, 10)
 	wg := &sync.WaitGroup{}
@@ -183,31 +215,44 @@ func updateBuildLogs(db *sql.DB, s3Connection *s3.S3, bucketName string) {
 		go func() {
 			defer wg.Done()
 			lock <- struct{}{}
+			defer func() { <-lock }()
+
 			log.Printf("Fetching build log for job %s...\n", id)
-			response, err := http.Get(url + "build-log.txt")
-			must(err)
+			response, err := http.Get(url + sourcePath)
+			if err != nil {
+				log.Printf("Failed to fetch asset %s for job %s", assetType, id)
+				return
+			}
 			data, err := ioutil.ReadAll(response.Body)
 			must(err)
 			must(response.Body.Close())
 
-			_, err = s3Connection.PutObject(&s3.PutObjectInput{
-				ACL:           aws.String("public-read"),
-				Body:          bytes.NewReader(data),
-				Bucket:        aws.String(bucketName),
-				ContentLength: aws.Int64(int64(len(data))),
-				ContentType:   aws.String("application/octet-stream"),
-				Key:           aws.String("/" + id + "/build-log.txt"),
-			})
+			key := "/" + id + "/" + assetType
+			_, err = s3Connection.PutObject(
+				&s3.PutObjectInput{
+					ACL:           aws.String("public-read"),
+					Body:          bytes.NewReader(data),
+					Bucket:        aws.String(bucketName),
+					ContentLength: aws.Int64(int64(len(data))),
+					ContentType:   aws.String(mimeType),
+					Key:           aws.String(key),
+				},
+			)
 			must(err)
-
-			/*objectResult.
+			req, _ := s3Connection.GetObjectRequest(
+				&s3.GetObjectInput{
+					Bucket: aws.String(bucketName),
+					Key:    aws.String(key),
+				},
+			)
+			assetURL := req.HTTPRequest.URL
 
 			insertRes, err := db.Query(
-				"UPDATE jobs SET downloaded_build_logs=? WHERE id=?",
-				id)
+				"INSERT INTO assets (job_id, asset_type, asset_key, asset_url) VALUES (?, ?, ?, ?)",
+				id, assetType, key, assetURL,
+			)
 			must(err)
-			must(insertRes.Close())*/
-			<-lock
+			must(insertRes.Close())
 		}()
 	}
 	must(res.Close())

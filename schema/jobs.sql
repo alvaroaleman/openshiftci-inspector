@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS refs;
 DROP TABLE IF EXISTS pulls;
 DROP TABLE IF EXISTS build_logs;
+DROP TABLE IF EXISTS assets;
 DROP TABLE IF EXISTS jobs;
 CREATE TABLE jobs
 (
@@ -22,8 +23,6 @@ CREATE TABLE jobs
     git_base_link   VARCHAR(255),
 
     artifacts_url VARCHAR(255),
-
-    downloaded_build_logs VARCHAR(255) DEFAULT NULL,
 
     INDEX i_status (status)
 );
@@ -47,3 +46,13 @@ CREATE TABLE pulls
             ON DELETE RESTRICT,
     UNIQUE u_pulls (job_id, number, sha)
 );
+
+CREATE TABLE assets (
+    id         BIGINT PRIMARY KEY AUTO_INCREMENT,
+    job_id     VARCHAR(255),
+    asset_type VARCHAR(255),
+    asset_key  VARCHAR(255),
+    asset_url  VARCHAR(255),
+
+    UNIQUE u_assets(job_id, asset_type)
+)
