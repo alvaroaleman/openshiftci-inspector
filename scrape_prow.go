@@ -160,14 +160,36 @@ func main() {
 	s3connection := s3.New(sess)
 	updateJobs(db)
 	updateArtifactURLs(db)
+	bucket := os.Getenv("S3_BUCKET")
 
 	updateAssets(
 		db,
 		s3connection,
-		os.Getenv("S3_BUCKET"),
+		bucket,
 		"build_log",
 		"build-log.txt",
 		"text/plain",
+		"ovirt",
+	)
+
+	updateAssets(
+		db,
+		s3connection,
+		bucket,
+		"events",
+		"artifacts/e2e-ovirt/events.json",
+		"application/json",
+		"ovirt",
+	)
+
+	updateAssets(
+		db,
+		s3connection,
+		bucket,
+		"events",
+		"artifacts/e2e-ovirt/metrics/prometheus.tar",
+		"application/json",
+		"ovirt",
 	)
 }
 
@@ -178,10 +200,23 @@ func updateAssets(
 	assetType string,
 	sourcePath string,
 	mimeType string,
+	filter string,
 ) {
-	res, err := db.Query(
-		"SELECT jobs.id, artifacts_url FROM jobs LEFT JOIN assets a on jobs.id = a.job_id WHERE asset_type=?", assetType,
-	)
+	log.Println("Fetching " + assetType + " assets...")
+	var res *sql.Rows
+	var err error
+	if filter != "" {
+		filterLike := "%" + filter + "%"
+		res, err = db.Query(
+			"SELECT jobs.id, artifacts_url FROM jobs LEFT JOIN assets a on jobs.id = a.job_id AND asset_type=? WHERE a.job_id IS NULL AND (url LIKE ? OR job_name_safe LIKE ? OR job LIKE ?)",
+			assetType, filterLike, filterLike, filterLike,
+		)
+	} else {
+		res, err = db.Query(
+			"SELECT jobs.id, artifacts_url FROM jobs LEFT JOIN assets a on jobs.id = a.job_id AND asset_type=? WHERE a.job_id IS NULL",
+			assetType,
+		)
+	}
 	must(err)
 
 	_, err = s3Connection.GetBucketLocation(
@@ -193,6 +228,7 @@ func updateAssets(
 		_, err = s3Connection.CreateBucket(
 			&s3.CreateBucketInput{
 				Bucket: aws.String(bucketName),
+				ACL:    aws.String(s3.BucketCannedACLPublicRead),
 			},
 		)
 		must(err)
@@ -216,8 +252,8 @@ func updateAssets(
 			defer wg.Done()
 			lock <- struct{}{}
 			defer func() { <-lock }()
+			log.Println("Fetching the " + assetType + " asset for job " + id + "...")
 
-			log.Printf("Fetching build log for job %s...\n", id)
 			response, err := http.Get(url + sourcePath)
 			if err != nil {
 				log.Printf("Failed to fetch asset %s for job %s", assetType, id)
@@ -227,10 +263,14 @@ func updateAssets(
 			must(err)
 			must(response.Body.Close())
 
+			if len(data) == 0 {
+				return
+			}
+
 			key := "/" + id + "/" + assetType
 			_, err = s3Connection.PutObject(
 				&s3.PutObjectInput{
-					ACL:           aws.String("public-read"),
+					ACL:           aws.String(s3.BucketCannedACLPublicRead),
 					Body:          bytes.NewReader(data),
 					Bucket:        aws.String(bucketName),
 					ContentLength: aws.Int64(int64(len(data))),
@@ -245,7 +285,8 @@ func updateAssets(
 					Key:    aws.String(key),
 				},
 			)
-			assetURL := req.HTTPRequest.URL
+			must(req.Sign())
+			assetURL := req.HTTPRequest.URL.String()
 
 			insertRes, err := db.Query(
 				"INSERT INTO assets (job_id, asset_type, asset_key, asset_url) VALUES (?, ?, ?, ?)",
