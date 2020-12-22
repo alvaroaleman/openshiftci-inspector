@@ -22,7 +22,7 @@ export MYSQL_PASSWORD=inspector
 export MYSQL_DB=inspector
 export S3_ACCESS_KEY_ID=inspector
 export S3_SECRET_ACCESS_KEY=inspector
-export S3_ENDPOINT="http://127.0.0.1:9000"
+export S3_ENDPOINT=http://127.0.0.1:9000
 export S3_REGION=us-east-1
 export S3_PATH_STYLE_ACCESS=1
 go run scrape_prow.go
