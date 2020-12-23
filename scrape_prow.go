@@ -186,7 +186,7 @@ func main() {
 		db,
 		s3connection,
 		bucket,
-		"events",
+		"prometheus",
 		"artifacts/e2e-ovirt/metrics/prometheus.tar",
 		"application/json",
 		"ovirt",
