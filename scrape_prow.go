@@ -20,6 +20,10 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/common/promlog"
+	"github.com/prometheus/prometheus/promql"
+	"github.com/prometheus/prometheus/storage/tsdb"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -418,4 +422,56 @@ func updateJobs(db *sql.DB) {
 			log.Fatalln(err)
 		}
 	}
+}
+
+func extractPrometheusMetrics(
+	db *sql.DB,
+	s3Connection *s3.S3,
+	bucketName string,
+) {
+	assetResult, err := db.Query(
+		"SELECT asset_key FROM assets a WHERE asset_type = ?",
+	)
+	must(err)
+
+	for {
+		key := ""
+		if !assetResult.Next() {
+			break
+		}
+		must(assetResult.Scan(&key))
+
+		// region Download tar from S3
+		// endregion
+
+		// region Query Prometheus
+		prometheusLog := promlog.New(&promlog.Config{
+			Level:  nil,
+			Format: nil,
+		})
+		registry := prometheus.NewRegistry()
+		promDB, err := tsdb.Open(
+			"test",
+			prometheusLog,
+			registry,
+			&tsdb.Options{
+				NoLockfile: true,
+			},
+		)
+		must(err)
+		adapter := tsdb.Adapter(promDB, int64(0))
+		engine := promql.NewEngine(promql.EngineOpts{
+			Logger:        prometheusLog,
+			Reg:           nil,
+			MaxConcurrent: 0,
+			MaxSamples:    0,
+			Timeout:       0,
+		})
+		duration, _ := time.ParseDuration("5s")
+		query, err := engine.NewRangeQuery(adapter, "up", time.Now(), time.Now(), duration)
+		must(err)
+		_ = query.Exec(context.Background())
+		// endregion
+	}
+	must(assetResult.Close())
 }
