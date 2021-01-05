@@ -468,9 +468,18 @@ func extractPrometheusMetrics(
 			Timeout:       0,
 		})
 		duration, _ := time.ParseDuration("5s")
-		query, err := engine.NewRangeQuery(adapter, "up", time.Now(), time.Now(), duration)
+		query := "up"
+		startTime := time.Now()
+		endTime := time.Now()
+		queryResult, err := engine.NewRangeQuery(
+			adapter,
+			query,
+			startTime,
+			endTime,
+			duration,
+		)
 		must(err)
-		_ = query.Exec(context.Background())
+		_ = queryResult.Exec(context.Background())
 		// endregion
 	}
 	must(assetResult.Close())
