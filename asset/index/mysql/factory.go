@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/janoszen/openshiftci-inspector/asset/index"
+	"github.com/janoszen/openshiftci-inspector/storage/mysql"
 )
 
 const (
@@ -20,18 +21,21 @@ CREATE TABLE IF NOT EXISTS job_assets (
 )
 
 // NewMySQLAssetIndex creates a MySQL storage for asset indexes.
-func NewMySQLAssetIndex(config Config) (index.AssetIndex, error) {
+func NewMySQLAssetIndex(config mysql.Config) (index.AssetIndex, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
 	db, err := sql.Open(
 		"mysql",
-		config.connectString(),
+		config.ConnectString(),
 	)
 	if err != nil {
 		return nil, err
 	}
-	if _, err := db.Exec("CREATE DATABASE IF NOT EXISTS ?", config.Database); err != nil {
+	if _, err := db.Exec(
+		"CREATE DATABASE IF NOT EXISTS ?",
+		config.Database,
+	); err != nil {
 		return nil, fmt.Errorf("failed to create database (%w)", err)
 	}
 	if _, err := db.Exec(CreateTableSQL, config.Database); err != nil {

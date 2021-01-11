@@ -31,7 +31,7 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-func (c *Config) connectString() string {
+func (c *Config) ConnectString() string {
 	host := c.Host
 	if c.Port > 0 {
 		host = fmt.Sprintf("%s:%d", host, c.Port)

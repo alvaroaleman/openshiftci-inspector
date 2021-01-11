@@ -9,7 +9,7 @@ import (
 // JobsIndex stores a database of all jobs.
 type JobsIndex interface {
 	// UpdateJob updates the data on a single job.
-	UpdateJob(job jobs.Job)
+	UpdateJob(job jobs.Job) (err error)
 
 	// ListJobs lists all jobs.
 	ListJobs() ([]jobs.Job, error)
