@@ -12,3 +12,12 @@ type AbstractJobsIndex struct {
 func (a *AbstractJobsIndex) Shutdown(_ context.Context) {
 
 }
+
+// AbstractJobsAssetURLStorage is a default implementation for JobsAssetURLStorage.
+type AbstractJobsAssetURLStorage struct {
+}
+
+// Shutdown stops the jobs asset URL storage.
+func (a *AbstractJobsAssetURLStorage) Shutdown(_ context.Context) {
+
+}
