@@ -67,6 +67,6 @@ type job struct {
 	Status     jobStatus   `json:"status"`
 }
 
-type jobs struct {
+type jobList struct {
 	Items []job `json:"items"`
 }

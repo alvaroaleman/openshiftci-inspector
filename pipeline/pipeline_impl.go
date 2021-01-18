@@ -4,33 +4,31 @@ import (
 	"context"
 	"sync"
 
-	"github.com/janoszen/openshiftci-inspector/asset"
+	"github.com/janoszen/openshiftci-inspector/asset/downloader"
+	"github.com/janoszen/openshiftci-inspector/asset/index"
 	"github.com/janoszen/openshiftci-inspector/common"
-	"github.com/janoszen/openshiftci-inspector/jobs"
+	"github.com/janoszen/openshiftci-inspector/jobs/asseturl"
+	"github.com/janoszen/openshiftci-inspector/jobs/indexer"
+	"github.com/janoszen/openshiftci-inspector/jobs/scrape"
 )
 
 type pipelineImpl struct {
-	scraper         JobScraper
-	assetDownloader AssetDownloader
-	assetURLFetcher JobAssetURLFetcher
-	assetIndex      AssetIndex
-	jobIndexer      JobIndexer
+	scraper         scrape.JobsScraper
+	jobIndexer      indexer.JobIndexer
+	assetURLFetcher asseturl.JobAssetURLFetcher
+	assetIndex      index.AssetIndexer
+	assetDownloader downloader.AssetDownloader
 
 	runContext       context.Context
 	cancelRunContext func()
 }
 
 func (p *pipelineImpl) Run() {
-	jobsChannel := make(chan jobs.Job)
-	indexedJobsChannel := make(chan jobs.Job)
-	jobsWithAssetURLChannel := make(chan jobs.JobWithAssetURL)
-	assetWithJobPipeline := make(chan asset.AssetWithJob)
-
-	go p.scraper.Scrape(jobsChannel)
-	go p.jobIndexer.Index(jobsChannel, indexedJobsChannel)
-	go p.assetURLFetcher.Process(indexedJobsChannel, jobsWithAssetURLChannel)
-	go p.assetIndex.GetMissingAssets(jobsWithAssetURLChannel, assetWithJobPipeline)
-	go p.assetDownloader.Download(assetWithJobPipeline)
+	jobsChannel := p.scraper.Scrape()
+	indexedJobsChannel := p.jobIndexer.Index(jobsChannel)
+	jobsWithAssetURLChannel := p.assetURLFetcher.Process(indexedJobsChannel)
+	assetWithJobPipeline := p.assetIndex.GetMissingAssets(jobsWithAssetURLChannel)
+	p.assetDownloader.Download(assetWithJobPipeline)
 
 	<-p.runContext.Done()
 }

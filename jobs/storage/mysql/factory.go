@@ -1,9 +1,19 @@
-DROP TABLE IF EXISTS refs;
-DROP TABLE IF EXISTS pulls;
-DROP TABLE IF EXISTS build_logs;
-DROP TABLE IF EXISTS assets;
-DROP TABLE IF EXISTS jobs;
-CREATE TABLE jobs
+package mysql
+
+import (
+	"database/sql"
+	"fmt"
+
+	"github.com/janoszen/openshiftci-inspector/common/mysql"
+	"github.com/janoszen/openshiftci-inspector/jobs/storage"
+)
+
+const (
+	// language=MySQL
+	createDatabaseSQL = `CREATE DATABASE IF NOT EXISTS ?`
+	// language=MySQL
+	createJobsTableSQL = `
+CREATE TABLE jobs IF NOT EXISTS
 (
     id              VARCHAR(255) PRIMARY KEY COMMENT 'metadata.uid',
     job             VARCHAR(255) COMMENT 'spec.job',
@@ -25,9 +35,11 @@ CREATE TABLE jobs
     artifacts_url VARCHAR(255),
 
     INDEX i_status (status)
-);
-
-CREATE TABLE pulls
+)
+`
+	// language=MySQL
+	createJobsPullsSQL = `
+CREATE TABLE job_pulls IF NOT EXISTS
 (
     id          BIGINT PRIMARY KEY AUTO_INCREMENT,
     job_id      VARCHAR(255),
@@ -45,14 +57,36 @@ CREATE TABLE pulls
             ON UPDATE CASCADE
             ON DELETE RESTRICT,
     UNIQUE u_pulls (job_id, number, sha)
-);
-
-CREATE TABLE assets (
-    id         BIGINT PRIMARY KEY AUTO_INCREMENT,
-    job_id     VARCHAR(255),
-    asset_type VARCHAR(255),
-    asset_key  VARCHAR(255),
-    asset_url  VARCHAR(255),
-
-    UNIQUE u_assets(job_id, asset_type)
 )
+`
+)
+
+// NewMySQLJobsStorage creates a MySQL storage for jobs.
+func NewMySQLJobsStorage(config mysql.Config) (storage.CompoundJobsStorage, error) {
+	if err := config.Validate(); err != nil {
+		return nil, err
+	}
+	db, err := sql.Open(
+		"mysql",
+		config.ConnectString(),
+	)
+	if err != nil {
+		return nil, err
+	}
+	if _, err := db.Exec(
+		createDatabaseSQL,
+		config.Database,
+	); err != nil {
+		return nil, fmt.Errorf("failed to create database (%w)", err)
+	}
+	if _, err := db.Exec(createJobsTableSQL, config.Database); err != nil {
+		return nil, fmt.Errorf("failed to create jobs table (%w)", err)
+	}
+	if _, err := db.Exec(createJobsPullsSQL, config.Database); err != nil {
+		return nil, fmt.Errorf("failed to create job_pulls table (%w)", err)
+	}
+
+	return &mysqlJobsStorage{
+		db: db,
+	}, nil
+}

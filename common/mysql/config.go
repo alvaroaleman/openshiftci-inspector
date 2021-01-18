@@ -31,6 +31,7 @@ func (c *Config) Validate() error {
 	return nil
 }
 
+// ConnectString returns a MySQL connect string from the settings.
 func (c *Config) ConnectString() string {
 	host := c.Host
 	if c.Port > 0 {

@@ -4,12 +4,17 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/janoszen/openshiftci-inspector/asset/index"
-	"github.com/janoszen/openshiftci-inspector/storage/mysql"
+	"github.com/janoszen/openshiftci-inspector/asset/indexstorage"
+	"github.com/janoszen/openshiftci-inspector/common/mysql"
 )
 
 const (
-	CreateTableSQL = `
+	// language=MySQL
+	createDatabaseSQL = `
+CREATE DATABASE IF NOT EXISTS ?
+`
+	// language=MySQL
+	createTableSQL = `
 CREATE TABLE IF NOT EXISTS job_assets (
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
 	job_id BIGINT NOT NULL,
@@ -21,7 +26,7 @@ CREATE TABLE IF NOT EXISTS job_assets (
 )
 
 // NewMySQLAssetIndex creates a MySQL storage for asset indexes.
-func NewMySQLAssetIndex(config mysql.Config) (index.AssetIndex, error) {
+func NewMySQLAssetIndex(config mysql.Config) (indexstorage.AssetIndex, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
@@ -33,12 +38,12 @@ func NewMySQLAssetIndex(config mysql.Config) (index.AssetIndex, error) {
 		return nil, err
 	}
 	if _, err := db.Exec(
-		"CREATE DATABASE IF NOT EXISTS ?",
+		createDatabaseSQL,
 		config.Database,
 	); err != nil {
 		return nil, fmt.Errorf("failed to create database (%w)", err)
 	}
-	if _, err := db.Exec(CreateTableSQL, config.Database); err != nil {
+	if _, err := db.Exec(createTableSQL, config.Database); err != nil {
 		return nil, fmt.Errorf("failed to create assets table (%w)", err)
 	}
 

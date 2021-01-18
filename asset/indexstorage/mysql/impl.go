@@ -5,14 +5,10 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/janoszen/openshiftci-inspector/asset/index"
-
 	_ "github.com/go-sql-driver/mysql"
 )
 
 type mysqlAssetIndex struct {
-	index.AbstractAssetIndex
-
 	db *sql.DB
 }
 

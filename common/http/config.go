@@ -11,10 +11,10 @@ import (
 
 // Config is the configuration structure for the HTTP scraper.
 type Config struct {
-	// BaseURL is the starting URL of the scraping of Prow.
-	BaseURL string `json:"baseurl" yaml:"baseurl" env:"SCRAPE_BASEURL"`
+	// BaseURL is the starting URL of the process.
+	BaseURL string `json:"baseurl" yaml:"baseurl" env:"HTTP_BASEURL"`
 	// CACert is the CA certificate to check against when accessing Prow.
-	CACert string `json:"cacert" yaml:"cacert" env:"SCRAPE_CACERT_FILE"`
+	CACert string `json:"cacert" yaml:"cacert" env:"HTTP_CACERT_FILE"`
 
 	// caCertPool is an internal structure populated by the Validate method.
 	caCertPool *x509.CertPool

@@ -7,13 +7,51 @@ import (
 	"strings"
 
 	"github.com/janoszen/openshiftci-inspector/jobs"
+	"github.com/janoszen/openshiftci-inspector/jobs/storage"
 )
 
-type mysqlJobsIndex struct {
+type mysqlJobsStorage struct {
 	db *sql.DB
 }
 
-func (m *mysqlJobsIndex) UpdateJob(job jobs.Job) (err error) {
+func (m *mysqlJobsStorage) UpdateAssetURL(job jobs.Job, assetURL string) error {
+	_, err := m.db.Exec(
+		// language=MySQL
+		`UPDATE jobs SET artifacts_url=? WHERE id=?`,
+		assetURL,
+		job.ID,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *mysqlJobsStorage) GetAssetURLForJob(job jobs.Job) (assetURL string, err error) {
+	result, err := m.db.Query(
+		// language=MySQL
+		`SELECT artifacts_url FROM jobs WHERE id=?`,
+		job.ID,
+	)
+	if err != nil {
+		return "", err
+	}
+	defer func() {
+		_ = result.Close()
+	}()
+	if !result.Next() {
+		return "", storage.JobHasNoAssetURL
+	}
+	if err := result.Scan(&assetURL); err != nil {
+		return "", err
+	}
+	if assetURL == "" {
+		return "", storage.JobHasNoAssetURL
+	}
+	return assetURL, nil
+}
+
+func (m *mysqlJobsStorage) UpdateJob(job jobs.Job) (err error) {
 	if err := m.upsertJob(job); err != nil {
 		return err
 	}
@@ -27,7 +65,7 @@ func (m *mysqlJobsIndex) UpdateJob(job jobs.Job) (err error) {
 		placeholders = append(placeholders, "?")
 	}
 	_, err = m.db.Exec(
-		`-- language=mysql
+		`
 DELETE FROM job_pulls
 WHERE
 	job_id=?
@@ -41,9 +79,10 @@ WHERE
 	return nil
 }
 
-func (m *mysqlJobsIndex) upsertPull(job jobs.Job, pull jobs.Pull) error {
+func (m *mysqlJobsStorage) upsertPull(job jobs.Job, pull jobs.Pull) error {
 	_, err := m.db.Exec(
-		`-- language=mysql
+		// language=MySQL
+		`
 INSERT INTO job_pulls (
   	job_id,
     number,
@@ -80,9 +119,10 @@ INSERT INTO job_pulls (
 	return nil
 }
 
-func (m *mysqlJobsIndex) upsertJob(job jobs.Job) (err error) {
+func (m *mysqlJobsStorage) upsertJob(job jobs.Job) (err error) {
 	_, err = m.db.Exec(
-		`-- language=mysql
+		// language=MySQL
+		`
 INSERT INTO jobs (
     id,
     job,
@@ -131,7 +171,7 @@ INSERT INTO jobs (
 	return nil
 }
 
-func (m *mysqlJobsIndex) ListJobs() (jobList []jobs.Job, err error) {
+func (m *mysqlJobsStorage) ListJobs() (jobList []jobs.Job, err error) {
 	var result *sql.Rows
 	result, err = m.db.Query(
 		`-- language=mysql
@@ -184,6 +224,6 @@ FROM jobs`,
 	return jobList, nil
 }
 
-func (m *mysqlJobsIndex) Shutdown(_ context.Context) {
+func (m *mysqlJobsStorage) Shutdown(_ context.Context) {
 	_ = m.db.Close()
 }

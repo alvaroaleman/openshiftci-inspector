@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -13,7 +12,6 @@ import (
 )
 
 type httpJobsScraper struct {
-	tlsConfig            *tls.Config
 	httpClient           *http.Client
 	baseURL              string
 	runContext           context.Context
@@ -59,13 +57,13 @@ func (h *httpJobsScraper) doScrapeRun(jobChannels chan jobs.Job) {
 		return
 	}
 
-	jobList := jobs{}
-	if err := json.Unmarshal([]byte(rawJSON), &jobList); err != nil {
+	list := jobList{}
+	if err := json.Unmarshal([]byte(rawJSON), &list); err != nil {
 		//TODO log
 		return
 	}
 
-	for _, rawJob := range jobList.Items {
+	for _, rawJob := range list.Items {
 		jobNameSafe := ""
 		if len(rawJob.Spec.PodSpec.Containers) > 0 {
 			for _, env := range rawJob.Spec.PodSpec.Containers[0].Env {
