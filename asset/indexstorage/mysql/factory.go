@@ -14,7 +14,7 @@ const (
 	createTableSQL = `
 CREATE TABLE IF NOT EXISTS job_assets (
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
-	job_id BIGINT NOT NULL,
+	job_id VARCHAR(255) NOT NULL,
     asset_name VARCHAR(255) NOT NULL,
 	UNIQUE u_asset(job_id, asset_name),
 	INDEX i_job_id(job_id)

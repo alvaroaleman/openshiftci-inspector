@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS jobs
 (
     id              VARCHAR(255) PRIMARY KEY COMMENT 'metadata.uid',
     job             VARCHAR(255) COMMENT 'spec.job',
-    status          ENUM ("success", "failure", "pending", "aborted", "error", "") COMMENT 'status.state',
+    status          ENUM ('success', 'failure', 'pending', 'aborted', 'error', '') COMMENT 'status.state',
     start_time      DATETIME DEFAULT NULL COMMENT 'status.startTime',
     pending_time    DATETIME DEFAULT NULL COMMENT 'status.pendingTime',
     completion_time DATETIME DEFAULT NULL COMMENT 'status.completionTime',

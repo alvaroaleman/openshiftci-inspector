@@ -200,6 +200,10 @@ FROM jobs`,
 	if err != nil {
 		return nil, fmt.Errorf("failed to list jobs (%w)", err)
 	}
+	defer func() {
+		_ = result.Close()
+	}()
+
 	for {
 		if !result.Next() {
 			break

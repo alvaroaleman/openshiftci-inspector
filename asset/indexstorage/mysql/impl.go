@@ -23,7 +23,10 @@ func (m *mysqlAssetIndex) AddAsset(jobID string, name string) error {
 	if err != nil {
 		return err
 	}
-	return res.Close()
+	defer func() {
+		_ = res.Close()
+	}()
+	return nil
 }
 
 func (m *mysqlAssetIndex) HasAsset(jobID string, name string) (bool, error) {
@@ -35,6 +38,9 @@ func (m *mysqlAssetIndex) HasAsset(jobID string, name string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	defer func() {
+		_ = res.Close()
+	}()
 	if !res.Next() {
 		return false, errors.New("no rows returned from HasAsset query")
 	}
@@ -53,6 +59,9 @@ func (m *mysqlAssetIndex) ListAssets(jobID string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer func() {
+		_ = res.Close()
+	}()
 	assets := []string{}
 	for {
 		if !res.Next() {

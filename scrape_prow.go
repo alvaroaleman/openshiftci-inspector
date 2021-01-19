@@ -222,6 +222,9 @@ func updateAssets(
 		)
 	}
 	must(err)
+	defer func() {
+		_ = res.Close()
+	}()
 
 	_, err = s3Connection.GetBucketLocation(
 		&s3.GetBucketLocationInput{
@@ -307,6 +310,9 @@ func updateAssets(
 func updateArtifactURLs(db *sql.DB) {
 	res, err := db.Query("SELECT id, url FROM jobs WHERE artifacts_url IS NULL")
 	must(err)
+	defer func() {
+		_ = res.Close()
+	}()
 
 	artifactsRe := regexp.MustCompile(`<a href="(?P<url>[^"]+)">Artifacts</a>`)
 

@@ -34,23 +34,22 @@ func (d *assetDownloader) Download(assets <-chan asset.AssetWithJob) {
 				response, err := d.client.Get(a.Job.AssetURL + a.AssetName)
 				if err != nil {
 					d.logger.Printf("Failed to download URL %s (%v).", a.Job.AssetURL+a.AssetName, err)
-					// TODO error handling
 					continue
 				}
 				data, err := ioutil.ReadAll(response.Body)
 				_ = response.Body.Close()
 				if err != nil {
-					// TODO error handling
+					d.logger.Printf("Failed to download URL %s (%v).", a.Job.AssetURL+a.AssetName, err)
 					continue
 				}
 				err = d.storage.Store(a.Asset, "application/octet-stream", data)
 				if err != nil {
-					// TODO error handling
+					d.logger.Printf("Failed to store asset %s for job %s (%v).", a.AssetName, a.JobID, err)
 					continue
 				}
 				err = d.index.AddAsset(a.JobID, a.AssetName)
 				if err != nil {
-					// TODO error handling
+					d.logger.Printf("Failed to index asset %s for job %s (%v).", a.AssetName, a.JobID, err)
 					continue
 				}
 			}

@@ -2,6 +2,7 @@ package index
 
 import (
 	"context"
+	"log"
 
 	"github.com/janoszen/openshiftci-inspector/asset"
 	"github.com/janoszen/openshiftci-inspector/asset/indexstorage"
@@ -11,6 +12,7 @@ import (
 type assetIndexer struct {
 	assets  []string
 	storage indexstorage.AssetIndex
+	logger  *log.Logger
 
 	exit chan struct{}
 	done chan struct{}
@@ -35,10 +37,20 @@ func (a *assetIndexer) GetMissingAssets(urls <-chan jobs.JobWithAssetURL) <-chan
 				for _, assetName := range a.assets {
 					hasAsset, err := a.storage.HasAsset(jobID, assetName)
 					if err != nil {
-						// TODO log error
+						a.logger.Printf(
+							"Error while checking if asset %s is present for job %s (%v)",
+							assetName,
+							jobID,
+							err,
+						)
 						continue
 					}
 					if !hasAsset {
+						a.logger.Printf(
+							"Queueing asset %s for job %s for download...",
+							assetName,
+							jobID,
+						)
 						result <- asset.AssetWithJob{
 							Asset: asset.Asset{
 								JobID:     jobID,
@@ -46,6 +58,12 @@ func (a *assetIndexer) GetMissingAssets(urls <-chan jobs.JobWithAssetURL) <-chan
 							},
 							Job: url,
 						}
+					} else {
+						a.logger.Printf(
+							"Job %s already has asset %s.",
+							jobID,
+							assetName,
+						)
 					}
 				}
 			}

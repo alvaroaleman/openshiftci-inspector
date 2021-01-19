@@ -74,7 +74,7 @@ func main() {
 		"artifacts/e2e-ovirt/metrics/prometheus.tar",
 	}
 
-	assetIndex := index.New(assetIndexStorage, assets)
+	assetIndex := index.New(assetIndexStorage, logger, assets)
 
 	pathStyleAccess := os.Getenv("AWS_S3_PATH_STYLE_ACCESS") != ""
 	assetStorage, err := s3.NewS3AssetStorage(
