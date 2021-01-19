@@ -1,5 +1,9 @@
 package main
 
+/*
+Old stuff, use cmd/ instead.
+*/
+
 import (
 	"bytes"
 	"context"
