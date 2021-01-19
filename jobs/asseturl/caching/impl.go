@@ -8,11 +8,11 @@ import (
 	"github.com/janoszen/openshiftci-inspector/jobs/storage"
 )
 
-func (h *httpJobsAssetURLFetcher) Process(input <-chan jobs.Job) <-chan jobs.JobWithAssetURL {
+func (c *cachingJobsAssetURLFetcher) Process(input <-chan jobs.Job) <-chan jobs.JobWithAssetURL {
 	// TODO periodically retry and reinject jobs without asset URLs.
 
 	backendQueue := make(chan jobs.Job)
-	backendReturn := h.backend.Process(backendQueue)
+	backendReturn := c.backend.Process(backendQueue)
 
 	result := make(chan jobs.JobWithAssetURL)
 	go func() {
@@ -21,7 +21,7 @@ func (h *httpJobsAssetURLFetcher) Process(input <-chan jobs.Job) <-chan jobs.Job
 			//TODO log panic
 			close(backendQueue)
 			close(result)
-			close(h.done)
+			close(c.done)
 		}()
 	loop:
 		for {
@@ -32,10 +32,11 @@ func (h *httpJobsAssetURLFetcher) Process(input <-chan jobs.Job) <-chan jobs.Job
 				if !ok {
 					break loop
 				}
-			case <-h.exit:
+			case <-c.exit:
 				break loop
 			}
-			assetURL, err := h.storage.GetAssetURLForJob(job)
+			c.logger.Println("Fetching asset URL for job " + job.ID + "...")
+			assetURL, err := c.storage.GetAssetURLForJob(job)
 			if err != nil {
 				if errors.Is(err, storage.JobHasNoAssetURL) {
 					backendQueue <- job
@@ -43,13 +44,18 @@ func (h *httpJobsAssetURLFetcher) Process(input <-chan jobs.Job) <-chan jobs.Job
 					if !ok {
 						break loop
 					}
-					h.storage.UpdateAssetURL(job, jobResult.AssetURL)
-					assetURL = jobResult.AssetURL
+					if err := c.storage.UpdateAssetURL(job, jobResult.AssetURL); err != nil {
+						c.logger.Println("Failed store asset URL for job " + job.ID + ".")
+					} else {
+						assetURL = jobResult.AssetURL
+					}
 				} else {
+					c.logger.Printf("Failed to get asset URL for job %s (%v).\n", job.ID, err)
 					continue
 				}
 			}
 			if assetURL != "" {
+				c.logger.Println("Forwarding job " + job.ID + " with asset URL...")
 				result <- jobs.JobWithAssetURL{
 					Job:      job,
 					AssetURL: assetURL,
@@ -60,7 +66,7 @@ func (h *httpJobsAssetURLFetcher) Process(input <-chan jobs.Job) <-chan jobs.Job
 	return result
 }
 
-func (h *httpJobsAssetURLFetcher) Shutdown(ctx context.Context) {
+func (h *cachingJobsAssetURLFetcher) Shutdown(ctx context.Context) {
 	select {
 	case <-h.done:
 		return

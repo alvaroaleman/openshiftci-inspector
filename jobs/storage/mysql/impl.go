@@ -42,39 +42,44 @@ func (m *mysqlJobsStorage) GetAssetURLForJob(job jobs.Job) (assetURL string, err
 	if !result.Next() {
 		return "", storage.JobHasNoAssetURL
 	}
-	if err := result.Scan(&assetURL); err != nil {
+	var url *string
+	if err := result.Scan(&url); err != nil {
 		return "", err
 	}
-	if assetURL == "" {
+	if url == nil || *url == "" {
 		return "", storage.JobHasNoAssetURL
 	}
-	return assetURL, nil
+	return *url, nil
 }
 
 func (m *mysqlJobsStorage) UpdateJob(job jobs.Job) (err error) {
 	if err := m.upsertJob(job); err != nil {
 		return err
 	}
-	var pullNumbers []int
+	parameters := []interface{}{
+		job.ID,
+	}
 	var placeholders []string
 	for _, pull := range job.Pulls {
 		if err := m.upsertPull(job, pull); err != nil {
 			return err
 		}
-		pullNumbers = append(pullNumbers, pull.Number)
 		placeholders = append(placeholders, "?")
+		parameters = append(parameters, pull.Number)
 	}
-	_, err = m.db.Exec(
-		`
+	if len(placeholders) > 0 {
+		_, err = m.db.Exec(
+			`
 DELETE FROM job_pulls
 WHERE
 	job_id=?
 	AND
 	number NOT IN (`+strings.Join(placeholders, ", ")+`)`,
-		append([]interface{}{job.ID}, pullNumbers)...,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to delete unnecessary pulls for job %s (%w)", job.ID, err)
+			parameters...,
+		)
+		if err != nil {
+			return fmt.Errorf("failed to delete unnecessary pulls for job %s (%w)", job.ID, err)
+		}
 	}
 	return nil
 }

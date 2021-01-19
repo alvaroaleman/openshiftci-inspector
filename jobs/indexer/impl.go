@@ -3,6 +3,7 @@ package indexer
 import (
 	"context"
 	"errors"
+	"log"
 	"sync"
 
 	"github.com/janoszen/openshiftci-inspector/jobs"
@@ -16,6 +17,7 @@ type jobsIndexer struct {
 	done             chan struct{}
 	running          bool
 	mu               *sync.Mutex
+	logger           *log.Logger
 }
 
 func (s *jobsIndexer) Index(input <-chan jobs.Job) (output <-chan jobs.Job) {
@@ -35,8 +37,10 @@ func (s *jobsIndexer) Index(input <-chan jobs.Job) (output <-chan jobs.Job) {
 				if !ok {
 					break loop
 				}
+				s.logger.Println("Storing job " + job.ID + "...")
 				if err := s.storage.UpdateJob(job); err != nil {
-					//TODO log and retry
+					s.logger.Printf("Failed to store job "+job.ID+" (%v).\n", err)
+					//TODO retry
 				} else {
 					realOutput <- job
 				}

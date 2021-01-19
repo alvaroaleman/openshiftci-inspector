@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/janoszen/openshiftci-inspector/asset"
@@ -16,6 +17,7 @@ type assetDownloader struct {
 	index   indexstorage.AssetIndex
 	exit    chan struct{}
 	done    chan struct{}
+	logger  *log.Logger
 }
 
 func (d *assetDownloader) Download(assets <-chan asset.AssetWithJob) {
@@ -28,8 +30,10 @@ func (d *assetDownloader) Download(assets <-chan asset.AssetWithJob) {
 				if !ok {
 					return
 				}
+				d.logger.Printf("Downloading asset %s...\n", a.Job.AssetURL+a.AssetName)
 				response, err := d.client.Get(a.Job.AssetURL + a.AssetName)
 				if err != nil {
+					d.logger.Printf("Failed to download URL %s (%v).", a.Job.AssetURL+a.AssetName, err)
 					// TODO error handling
 					continue
 				}

@@ -2,13 +2,14 @@ package http
 
 import (
 	"context"
+	"log"
 
 	http2 "github.com/janoszen/openshiftci-inspector/common/http"
 	"github.com/janoszen/openshiftci-inspector/jobs/scrape"
 )
 
 // NewHTTPScraper creates a HTTP scraper for jobs.
-func NewHTTPScraper(config http2.Config) (scrape.JobsScraper, error) {
+func NewHTTPScraper(config http2.Config, logger *log.Logger) (scrape.JobsScraper, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
@@ -25,5 +26,6 @@ func NewHTTPScraper(config http2.Config) (scrape.JobsScraper, error) {
 		baseURL:              config.BaseURL,
 		runContext:           ctx,
 		runContextCancelFunc: cancel,
+		logger:               logger,
 	}, nil
 }

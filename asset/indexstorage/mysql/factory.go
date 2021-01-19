@@ -3,16 +3,13 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/janoszen/openshiftci-inspector/asset/indexstorage"
 	"github.com/janoszen/openshiftci-inspector/common/mysql"
 )
 
 const (
-	// language=MySQL
-	createDatabaseSQL = `
-CREATE DATABASE IF NOT EXISTS ?
-`
 	// language=MySQL
 	createTableSQL = `
 CREATE TABLE IF NOT EXISTS job_assets (
@@ -26,7 +23,7 @@ CREATE TABLE IF NOT EXISTS job_assets (
 )
 
 // NewMySQLAssetIndex creates a MySQL storage for asset indexes.
-func NewMySQLAssetIndex(config mysql.Config) (indexstorage.AssetIndex, error) {
+func NewMySQLAssetIndex(config mysql.Config, logger *log.Logger) (indexstorage.AssetIndex, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
@@ -38,16 +35,16 @@ func NewMySQLAssetIndex(config mysql.Config) (indexstorage.AssetIndex, error) {
 		return nil, err
 	}
 	if _, err := db.Exec(
-		createDatabaseSQL,
-		config.Database,
+		`CREATE DATABASE IF NOT EXISTS ` + config.Database,
 	); err != nil {
 		return nil, fmt.Errorf("failed to create database (%w)", err)
 	}
-	if _, err := db.Exec(createTableSQL, config.Database); err != nil {
+	if _, err := db.Exec(createTableSQL); err != nil {
 		return nil, fmt.Errorf("failed to create assets table (%w)", err)
 	}
 
 	return &mysqlAssetIndex{
-		db: db,
+		db:     db,
+		logger: logger,
 	}, nil
 }

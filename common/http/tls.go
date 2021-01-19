@@ -12,7 +12,7 @@ func (c Config) CreateTLSConfig() (tlsConfig *tls.Config, err error) {
 	}
 
 	tlsConfig = &tls.Config{
-		MinVersion: tls.VersionTLS13,
+		MinVersion: tls.VersionTLS12,
 		CurvePreferences: []tls.CurveID{
 			tls.X25519,
 			tls.CurveP521,
@@ -29,6 +29,8 @@ func (c Config) CreateTLSConfig() (tlsConfig *tls.Config, err error) {
 	}
 	if c.caCertPool != nil {
 		tlsConfig.RootCAs = c.caCertPool
+	} else {
+		tlsConfig.InsecureSkipVerify = true
 	}
 	return tlsConfig, nil
 }

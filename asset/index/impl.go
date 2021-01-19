@@ -60,7 +60,9 @@ func (a *assetIndexer) Shutdown(ctx context.Context) {
 	case <-a.done:
 		return
 	case <-ctx.Done():
-		close(a.exit)
+		if a.exit != nil {
+			close(a.exit)
+		}
 		<-a.done
 	}
 }

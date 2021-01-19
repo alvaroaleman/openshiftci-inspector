@@ -10,10 +10,8 @@ import (
 
 const (
 	// language=MySQL
-	createDatabaseSQL = `CREATE DATABASE IF NOT EXISTS ?`
-	// language=MySQL
 	createJobsTableSQL = `
-CREATE TABLE jobs IF NOT EXISTS
+CREATE TABLE IF NOT EXISTS jobs
 (
     id              VARCHAR(255) PRIMARY KEY COMMENT 'metadata.uid',
     job             VARCHAR(255) COMMENT 'spec.job',
@@ -39,7 +37,7 @@ CREATE TABLE jobs IF NOT EXISTS
 `
 	// language=MySQL
 	createJobsPullsSQL = `
-CREATE TABLE job_pulls IF NOT EXISTS
+CREATE TABLE IF NOT EXISTS job_pulls
 (
     id          BIGINT PRIMARY KEY AUTO_INCREMENT,
     job_id      VARCHAR(255),
@@ -51,7 +49,7 @@ CREATE TABLE job_pulls IF NOT EXISTS
     author_link VARCHAR(255),
 
     INDEX i_job_id (job_id),
-    CONSTRAINT fk_refs_job_id_jobs
+    CONSTRAINT fk_job_pulls_job_id
         FOREIGN KEY (job_id)
             REFERENCES jobs (id)
             ON UPDATE CASCADE
@@ -74,15 +72,14 @@ func NewMySQLJobsStorage(config mysql.Config) (storage.CompoundJobsStorage, erro
 		return nil, err
 	}
 	if _, err := db.Exec(
-		createDatabaseSQL,
-		config.Database,
+		`CREATE DATABASE IF NOT EXISTS ` + config.Database,
 	); err != nil {
 		return nil, fmt.Errorf("failed to create database (%w)", err)
 	}
-	if _, err := db.Exec(createJobsTableSQL, config.Database); err != nil {
+	if _, err := db.Exec(createJobsTableSQL); err != nil {
 		return nil, fmt.Errorf("failed to create jobs table (%w)", err)
 	}
-	if _, err := db.Exec(createJobsPullsSQL, config.Database); err != nil {
+	if _, err := db.Exec(createJobsPullsSQL); err != nil {
 		return nil, fmt.Errorf("failed to create job_pulls table (%w)", err)
 	}
 

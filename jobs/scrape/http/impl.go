@@ -3,7 +3,9 @@ package http
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -16,6 +18,7 @@ type httpJobsScraper struct {
 	baseURL              string
 	runContext           context.Context
 	runContextCancelFunc func()
+	logger               *log.Logger
 }
 
 func (h *httpJobsScraper) Scrape() <-chan jobs.Job {
@@ -38,6 +41,7 @@ func (h *httpJobsScraper) Shutdown(shutdownContext context.Context) {
 }
 
 func (h *httpJobsScraper) doScrapeRun(jobChannels chan jobs.Job) {
+	h.logger.Println("Scraping Prow for jobs...")
 	url := h.baseURL + "/prowjobs.js?var=allBuilds"
 	data, err := h.httpClient.Get(url)
 	if err != nil {
@@ -63,6 +67,7 @@ func (h *httpJobsScraper) doScrapeRun(jobChannels chan jobs.Job) {
 		return
 	}
 
+	h.logger.Println("Downloaded " + fmt.Sprintf("%d", len(list.Items)) + "jobs.")
 	for _, rawJob := range list.Items {
 		jobNameSafe := ""
 		if len(rawJob.Spec.PodSpec.Containers) > 0 {
@@ -99,12 +104,13 @@ func (h *httpJobsScraper) doScrapeRun(jobChannels chan jobs.Job) {
 				AuthorLink: p.AuthorLink,
 			})
 		}
-		for {
-			select {
-			case <-h.runContext.Done():
-				return
-			case jobChannels <- job:
-			}
+		select {
+		case <-h.runContext.Done():
+			h.logger.Println("Exiting scrape jobs.")
+			return
+		case jobChannels <- job:
+			h.logger.Println("Sent job " + job.ID + " for processing...")
 		}
 	}
+	h.logger.Println("Scrape run complete.")
 }

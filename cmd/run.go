@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -22,10 +23,14 @@ import (
 )
 
 func main() {
+	logger := log.New(os.Stdout, "", 0)
+
 	scraper, err := scrapeHTTP.NewHTTPScraper(
 		commonHTTP.Config{
 			BaseURL: "https://prow.ci.openshift.org/",
+			CACert:  os.Getenv("CA_CERT"),
 		},
+		logger,
 	)
 	if err != nil {
 		panic(err)
@@ -43,11 +48,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	jobIndexer := indexer.NewJobsIndexer(jobStorage)
+	jobIndexer := indexer.NewJobsIndexer(jobStorage, logger)
 
 	httpAssetURLFetcher, err := assetURLHTTP.NewHTTPAssetURLFetcher(
 		commonHTTP.Config{
 			BaseURL: "https://prow.ci.openshift.org/",
+			CACert:  os.Getenv("CA_CERT"),
 		},
 	)
 	if err != nil {
@@ -57,14 +63,18 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	assetURLFetcher := caching.New(httpAssetURLFetcher, jobsAssetStorage)
+	assetURLFetcher := caching.New(httpAssetURLFetcher, jobsAssetStorage, logger)
 
-	assetIndexStorage, err := mysqlAssetIndex.NewMySQLAssetIndex(mysqlConfig)
+	assetIndexStorage, err := mysqlAssetIndex.NewMySQLAssetIndex(mysqlConfig, logger)
 	if err != nil {
 		panic(err)
 	}
 
-	assetIndex := index.New(assetIndexStorage)
+	assets := []string{
+		"artifacts/e2e-ovirt/metrics/prometheus.tar",
+	}
+
+	assetIndex := index.New(assetIndexStorage, assets)
 
 	pathStyleAccess := os.Getenv("AWS_S3_PATH_STYLE_ACCESS") != ""
 	assetStorage, err := s3.NewS3AssetStorage(
@@ -76,14 +86,17 @@ func main() {
 			Endpoint:             os.Getenv("AWS_S3_ENDPOINT"),
 			ForcePathStyleAccess: pathStyleAccess,
 		},
+		logger,
 	)
 
 	assetDownloader, err := httpDownloader.New(
 		commonHTTP.Config{
 			BaseURL: "https://prow.ci.openshift.org/",
+			CACert:  os.Getenv("CA_CERT"),
 		},
 		assetStorage,
 		assetIndexStorage,
+		logger,
 	)
 	if err != nil {
 		panic(err)

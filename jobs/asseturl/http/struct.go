@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"regexp"
 
@@ -14,6 +15,7 @@ type httpAssetURLFetcher struct {
 	exit       chan struct{}
 	done       chan struct{}
 	baseURL    string
+	logger     *log.Logger
 }
 
 func (h *httpAssetURLFetcher) Process(input <-chan jobs.Job) <-chan jobs.JobWithAssetURL {
@@ -36,11 +38,13 @@ func (h *httpAssetURLFetcher) Process(input <-chan jobs.Job) <-chan jobs.JobWith
 				}
 				jobPage, err := http.Get(job.URL)
 				if err != nil {
+					h.logger.Printf("Failed to fetch URL %s (%v).", job.URL, err)
 					// TODO log and retry
 					continue
 				}
 				body, err := ioutil.ReadAll(jobPage.Body)
 				if err != nil {
+					h.logger.Printf("Failed to read from URL %s (%v).", job.URL, err)
 					//TODO log and retry
 					continue
 				}
@@ -50,8 +54,10 @@ func (h *httpAssetURLFetcher) Process(input <-chan jobs.Job) <-chan jobs.JobWith
 						Job:      job,
 						AssetURL: matches[1],
 					}
+				} else {
+					// TODO log and retry if no match
+					h.logger.Printf("No asset URL found in URL %s (%v).", job.URL, err)
 				}
-				// TODO log and retry if no match
 			}
 		}
 	}()

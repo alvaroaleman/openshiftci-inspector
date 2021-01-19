@@ -36,13 +36,8 @@ func (c *Config) Validate() error {
 			if !c.caCertPool.AppendCertsFromPEM(caCert) {
 				return fmt.Errorf("invalid CA certificate provided")
 			}
-		} else if runtime.GOOS == "windows" {
-			//Remove if https://github.com/golang/go/issues/16736 gets fixed
-			return fmt.Errorf(
-				"no CA certificate provided for HTTPS query while running on Windows: due to a bug (#16736) in " +
-					"Golang on Windows CA certificates have to be explicitly provided for https:// URLs",
-			)
-		} else {
+		} else if runtime.GOOS != "windows" {
+			//Remove condition if https://github.com/golang/go/issues/16736 gets fixed
 			var err error
 			c.caCertPool, err = x509.SystemCertPool()
 			if err != nil {

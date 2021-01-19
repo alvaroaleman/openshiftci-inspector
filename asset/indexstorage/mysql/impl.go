@@ -4,12 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 type mysqlAssetIndex struct {
-	db *sql.DB
+	db     *sql.DB
+	logger *log.Logger
 }
 
 func (m *mysqlAssetIndex) AddAsset(jobID string, name string) error {

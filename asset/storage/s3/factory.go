@@ -2,6 +2,7 @@ package s3
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -12,9 +13,7 @@ import (
 )
 
 // NewS3AssetStorage creates an asset storage that stores assets on an S3-compatible object storage.
-func NewS3AssetStorage(
-	config S3AssetStorageConfig,
-) (storage.AssetStorage, error) {
+func NewS3AssetStorage(config S3AssetStorageConfig, logger *log.Logger) (storage.AssetStorage, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
@@ -34,6 +33,7 @@ func NewS3AssetStorage(
 	return &s3AssetStorage{
 		s3:     s3connection,
 		bucket: config.Bucket,
+		logger: logger,
 	}, nil
 }
 
@@ -80,7 +80,7 @@ func ensureBucket(config S3AssetStorageConfig, s3connection *s3.S3) (storage.Ass
 			return nil, fmt.Errorf(
 				"bucket %s is in %s but the region configuration specifies %s",
 				config.Bucket,
-				bucketLocation.LocationConstraint,
+				*bucketLocation.LocationConstraint,
 				config.Region,
 			)
 		}
