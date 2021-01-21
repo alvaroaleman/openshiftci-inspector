@@ -85,6 +85,8 @@ func (s *server) Start() error {
 		}
 	}
 
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./frontend/build/")))
+
 	s.srv = &http.Server{
 		Handler: r,
 	}

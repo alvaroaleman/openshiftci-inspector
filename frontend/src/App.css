@@ -1,0 +1,19 @@
+
+.app {
+  display:flex;
+  height:100%;
+}
+
+.app__sidebar {
+  width:270px;
+  border-right:1px solid #cccccc;
+}
+
+.app__main {
+  flex:1;
+  position:relative;
+}
+
+.app__top {
+
+}
