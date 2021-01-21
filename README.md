@@ -53,3 +53,16 @@ go run cmd/api.go
 ```
 
 This will start the API on `0.0.0.0:8080`. You can test it by going to http://localhost:8080/ .
+
+### Generating the client library
+
+You can use [Go Swagger](https://goswagger.io/) to generate the Swagger definitions for the API:
+
+```
+goswagger generate spec -o swagger.yaml
+```
+
+You can then take the swagger file to generate a Typescript frontend client:
+
+```
+```

@@ -25,16 +25,45 @@ func (j *jobsListAPI) GetRoutes() []api.Route {
 	}
 }
 
+// Handle returns a list of jobs currently stored.
+//
+// swagger:route GET /jobs jobs listJobs
+//
+// Get a list of jobs currently stored.
+//
+// Produces:
+// - application/json
+//
+// Consumes:
+// - application/json
+//
+// Schemes: http
+//
+// Responses:
+// default: JobsListResponse
+//
 func (j *jobsListAPI) Handle(_ api.Request, response api.Response) error {
 	jobList, err := j.storage.ListJobs()
 	if err != nil {
 		return err
 	}
-	return response.Encode(JobsListResponseBody{
+	return response.Encode(JobsListResponse{JobsListResponseBody{
 		Jobs: jobList,
-	})
+	}})
 }
 
+// swagger:response JobsListResponse
+type JobsListResponse struct {
+	// In: body
+	JobsListResponseBody JobsListResponseBody `json:",inline"`
+}
+
+// JobsListResponseBody represents a response with a job list.
+//
+// swagger:model
 type JobsListResponseBody struct {
-	Jobs []jobs.Job
+	// Jobs is the list of jobs in the response
+	//
+	// required: true
+	Jobs []jobs.Job `json:"jobs"`
 }
