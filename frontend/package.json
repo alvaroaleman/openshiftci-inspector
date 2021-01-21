@@ -4,28 +4,28 @@
   "private": true,
   "dependencies": {
     "@blueprintjs/core": "^3.37.0",
-    "@blueprintjs/datetime": "^3.1.0",
-    "@blueprintjs/select": "^3.1.0",
-    "@blueprintjs/table": "^3.1.0",
-    "@blueprintjs/timezone": "^3.1.0",
+    "@blueprintjs/datetime": "^3.20.1",
+    "@blueprintjs/select": "^3.15.1",
+    "@blueprintjs/table": "^3.8.19",
+    "@blueprintjs/timezone": "^3.8.1",
     "@material-ui/core": "latest",
     "@material-ui/icons": "^4.11.2",
-    "@types/jest": "^23.3.1",
-    "@types/moment-timezone": "^0.5.7",
-    "@types/node": "^10.5.7",
+    "@types/jest": "^26.0.20",
+    "@types/moment-timezone": "^0.5.13",
+    "@types/node": "^14.14.22",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "js-joda": "^1.8.2",
+    "js-joda": "^1.10.1",
     "react": "latest",
     "react-dom": "latest",
-    "react-scripts-ts": "^4.0.8",
+    "react-scripts": "latest",
     "typescript": "latest"
   },
   "scripts": {
-    "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
-    "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
   },
   "browserslist": {
     "production": [
@@ -38,5 +38,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "swagger-ts-client": "^0.9.6"
   }
 }
