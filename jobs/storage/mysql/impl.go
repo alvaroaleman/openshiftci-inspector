@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/janoszen/openshiftci-inspector/jobs"
 	"github.com/janoszen/openshiftci-inspector/jobs/storage"
@@ -179,7 +180,8 @@ INSERT INTO jobs (
 func (m *mysqlJobsStorage) ListJobs() (jobList []jobs.Job, err error) {
 	var result *sql.Rows
 	result, err = m.db.Query(
-		`-- language=mysql
+		// language=MySQL
+		`
 SELECT
 	id,
     job,
@@ -209,14 +211,17 @@ FROM jobs`,
 			break
 		}
 		job := jobs.Job{}
+		var startTime []uint8
+		var pendingTime []uint8
+		var completionTime []uint8
 		err := result.Scan(
 			&job.ID,
 			&job.Job,
 			&job.JobSafeName,
 			&job.Status,
-			&job.StartTime,
-			&job.PendingTime,
-			&job.CompletionTime,
+			&startTime,
+			&pendingTime,
+			&completionTime,
 			&job.URL,
 			&job.GitOrg,
 			&job.GitRepo,
@@ -228,9 +233,79 @@ FROM jobs`,
 		if err != nil {
 			return nil, fmt.Errorf("failed to fetch job row (%w)", err)
 		}
+		if job.StartTime, err = m.decodeTime(startTime); err != nil {
+			return nil, err
+		}
+		if job.PendingTime, err = m.decodeTime(pendingTime); err != nil {
+			return nil, err
+		}
+		if job.CompletionTime, err = m.decodeTime(completionTime); err != nil {
+			return nil, err
+		}
+
+		pulls, err := m.getJobPulls(job.ID)
+		if err != nil {
+			return nil, err
+		}
+		job.Pulls = pulls
 		jobList = append(jobList, job)
 	}
 	return jobList, nil
+}
+
+func (m *mysqlJobsStorage) getJobPulls(jobID string) ([]jobs.Pull, error) {
+	// TODO work around N+1 queries
+	pullsResult, err := m.db.Query(
+		// language=MySQL
+		`
+SELECT
+	number, author, sha, pull_link, commit_link, author_link
+FROM
+	job_pulls
+WHERE job_id = ?
+`,
+		jobID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = pullsResult.Close()
+	}()
+	// We explicitly want this to be an empty slice.
+	//goland:noinspection GoPreferNilSlice
+	pulls := []jobs.Pull{}
+	for {
+		if !pullsResult.Next() {
+			break
+		}
+
+		pull := jobs.Pull{}
+		err := pullsResult.Scan(
+			&pull.Number,
+			&pull.Author,
+			&pull.SHA,
+			&pull.PullLink,
+			&pull.CommitLink,
+			&pull.AuthorLink,
+		)
+		if err != nil {
+			return nil, err
+		}
+		pulls = append(pulls, pull)
+	}
+	return pulls, nil
+}
+
+func (m *mysqlJobsStorage) decodeTime(timeBytes []uint8) (*time.Time, error) {
+	if timeBytes != nil {
+		t, err := time.Parse("2006-01-02 15:04:05", string(timeBytes))
+		if err != nil {
+			return nil, err
+		}
+		return &t, nil
+	}
+	return nil, nil
 }
 
 func (m *mysqlJobsStorage) Shutdown(_ context.Context) {

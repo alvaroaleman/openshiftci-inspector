@@ -5,6 +5,7 @@ go 1.14
 require (
 	github.com/aws/aws-sdk-go v1.36.13
 	github.com/go-sql-driver/mysql v1.5.0
+	github.com/gorilla/mux v1.7.3
 	github.com/prometheus/client_golang v1.9.0
 	github.com/prometheus/common v0.15.0
 	github.com/prometheus/prometheus v2.5.0+incompatible

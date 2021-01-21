@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 
+	_ "github.com/go-sql-driver/mysql"
+
 	"github.com/janoszen/openshiftci-inspector/asset/indexstorage"
 	"github.com/janoszen/openshiftci-inspector/common/mysql"
 )

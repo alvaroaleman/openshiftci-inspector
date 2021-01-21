@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 
+	_ "github.com/go-sql-driver/mysql"
+
 	"github.com/janoszen/openshiftci-inspector/common/mysql"
 	"github.com/janoszen/openshiftci-inspector/jobs/storage"
 )
