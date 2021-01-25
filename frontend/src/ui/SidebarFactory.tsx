@@ -1,3 +1,4 @@
+// @ts-ignore
 import * as React from "react";
 import LinkFactory from "../router/ui/LinkFactory";
 import Sidebar from "./Sidebar";

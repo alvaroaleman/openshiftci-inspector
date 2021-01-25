@@ -1,13 +1,15 @@
-// Schemes: http
-// Host: localhost
-// BasePath: /
-// Version: 0.0.1
+// Package classification Openshift CI Inspector.
 //
-// Consumes:
-// - application/json
+//     Schemes: http
+//     Host: localhost
+//     BasePath: /
+//     Version: 0.0.1
 //
-// Produces:
-// - application/json
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
 //
 // swagger:meta
 //

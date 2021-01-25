@@ -14,7 +14,7 @@ class BrowserHistoryService implements IRouteChangeHandler, IPageTitleChangeHand
         this.routingService.registerRouteChangeHandler(this);
     };
 
-    public onPopState = (event: PopStateEvent) : void => {
+    public onPopState = () : void => {
         this.routingService.changeRoute(this.window.location.pathname)
     };
 

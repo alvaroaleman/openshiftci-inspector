@@ -1,3 +1,4 @@
+// @ts-ignore
 import * as React from "react";
 import PageTitleService from "../service/PageTitleService";
 import RoutingService from "../service/RoutingService";

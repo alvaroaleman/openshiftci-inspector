@@ -9,7 +9,7 @@ export interface ISidebarProps {
 }
 
 class Sidebar extends React.Component<ISidebarProps> {
-    public render() {
+    render() {
         return <div>
             <Box m={2}>
                 <Typography variant={"h5"} component={"h1"} gutterBottom={true}>Openshift CI Inspector</Typography>

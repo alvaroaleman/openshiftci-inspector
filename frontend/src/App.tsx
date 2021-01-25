@@ -9,7 +9,7 @@ interface IAppProps {
 }
 
 class App extends React.Component<IAppProps> {
-  public render() {
+  render() {
     return <div className="app">
         {this.props.toastHandler}
         <div className="app__sidebar">

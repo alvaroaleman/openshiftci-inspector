@@ -14,11 +14,23 @@ import LinkFactory from "./router/ui/LinkFactory";
 import RouterFactory from "./router/ui/RouterFactory";
 import theme from './theme';
 import SidebarFactory from "./ui/SidebarFactory";
+import {Configuration, JobsApiFactory} from "./api-client";
+import JobsListService from "./jobs/list";
 
 const notificationServiceFactory = new NotificationServiceFactory();
 const toastHandlerFactory = new ToastHandlerFactory(
     notificationServiceFactory
 );
+
+const baseURL = window.location.protocol + "//" + window.location.hostname + (
+    (window.location.protocol === "http:" && window.location.port !== "80") || (window.location.protocol === "https:" && window.location.port !== "443") ? ":" + window.location.port:""
+)
+
+const apiConfiguration = new Configuration({
+    basePath: baseURL
+})
+const jobsAPI = JobsApiFactory(apiConfiguration)
+const jobsListService = new JobsListService(jobsAPI, notificationServiceFactory.create())
 
 const routingServiceFactory = new RoutingServiceFactory(window.location.pathname);
 
@@ -32,9 +44,7 @@ const routerFactory = new RouterFactory(
 );
 
 const browserHistoryServiceFactory = new BrowserHistoryServiceFactory(
-    window.location.protocol + "//" + window.location.hostname + (
-        (window.location.protocol === "http:" && window.location.port !== "80") || (window.location.protocol === "https:" && window.location.port !== "443") ? ":" + window.location.port:""
-    ),
+    baseURL,
     window,
     routingServiceFactory.create()
 );
@@ -51,7 +61,7 @@ ReactDOM.render(
             toastHandler={toastHandlerFactory.create()}
             sidebar={sidebarFactory.create()}
         >
-            {routerFactory.create("/", "Dashboard", <Dashboard/>)}
+            {routerFactory.create("/", "Dashboard", <Dashboard jobsListService={jobsListService}/>)}
         </App>
     </ThemeProvider>,
     document.getElementById('root') as HTMLElement

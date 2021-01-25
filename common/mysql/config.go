@@ -6,6 +6,8 @@ import (
 )
 
 // Config is the configuration structure for the MySQL asset index.
+//
+//swagger:ignore
 type Config struct {
 	// Host is the host name for the MySQL connection
 	Host string `json:"host" yaml:"host" env:"MYSQL_HOST"`

@@ -11,7 +11,7 @@ interface IToastHandlerProps {
 }
 
 class ToastHandler extends React.PureComponent<IToastHandlerProps, {}> implements INotificationHandler {
-    private toaster: Toaster;
+    private toaster: Toaster|null = null;
     private refHandlers = {
         toaster: (ref: Toaster) => this.toaster = ref,
     };
@@ -50,11 +50,13 @@ class ToastHandler extends React.PureComponent<IToastHandlerProps, {}> implement
                 break;
         }
 
-        this.toaster.show({
-            icon: iconName,
-            intent: intentType,
-            message: notification.message
-        });
+        if (this.toaster!= null) {
+            this.toaster.show({
+                icon: iconName,
+                intent: intentType,
+                message: notification.message
+            })
+        }
     }
 
     public render() {

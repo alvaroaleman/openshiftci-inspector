@@ -1,6 +1,8 @@
 package api
 
 // Route describes a HTTP method and path routed to an API.
+//
+//swagger:ignore
 type Route struct {
 	Method string
 	Path   string

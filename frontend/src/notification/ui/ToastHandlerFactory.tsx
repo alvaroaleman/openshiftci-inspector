@@ -1,6 +1,7 @@
-import * as React from "react";
 import NotificationServiceFactory from "../service/NotificationServiceFactory";
 import ToastHandler from "./ToastHandler";
+// @ts-ignore
+import React from "react";
 
 class ToastHandlerFactory {
     public constructor(

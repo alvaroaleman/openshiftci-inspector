@@ -4,7 +4,7 @@ export interface IRouteChangeHandler {
 
 class RoutingService {
     private routeChangeHandlers: IRouteChangeHandler[] = [];
-    private currentRoute: string;
+    private currentRoute: string = "";
 
     constructor(initialRoute: string) {
         this.changeRoute(initialRoute);

@@ -47,11 +47,13 @@ func (j *jobsListAPI) Handle(_ api.Request, response api.Response) error {
 	if err != nil {
 		return err
 	}
-	return response.Encode(JobsListResponse{JobsListResponseBody{
+	return response.Encode(JobsListResponseBody{
 		Jobs: jobList,
-	}})
+	})
 }
 
+// JobsListResponse is the response to a request to list jobs in the Openshift CI.
+//
 // swagger:response JobsListResponse
 type JobsListResponse struct {
 	// In: body

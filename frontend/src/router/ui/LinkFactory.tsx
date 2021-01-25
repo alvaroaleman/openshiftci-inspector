@@ -1,12 +1,12 @@
-import * as React from "react";
 import RoutingService from "../service/RoutingService";
 import Link from "./Link";
+// @ts-ignore
+import * as React from "react";
 
 class LinkFactory {
     constructor(
         private readonly routingService : RoutingService
     ) {
-
     }
 
     public create(

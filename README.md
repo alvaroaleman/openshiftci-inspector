@@ -34,7 +34,11 @@ npm install
 npm run build
 ```
 
-### Running the web service
+### Running the frontend
+
+You can also run the frontend using the `npm start` command. API calls will be proxied to the API on port 8080 (see below). 
+
+### Running the API
 
 The API and web service can be run similar to the code above:
 
@@ -59,10 +63,14 @@ This will start the API on `0.0.0.0:8080`. You can test it by going to http://lo
 You can use [Go Swagger](https://goswagger.io/) to generate the Swagger definitions for the API:
 
 ```
-goswagger generate spec -o swagger.yaml
+goswagger generate spec -o swagger.json
 ```
 
 You can then take the swagger file to generate a Typescript frontend client:
 
 ```
+cd frontend
+npm run client
 ```
+
+This will update the src/api.ts file from the swagger.json file generated above.
