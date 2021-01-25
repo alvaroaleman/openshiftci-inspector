@@ -7,10 +7,13 @@ import {
     TableCell,
     TableContainer,
     TableHead,
-    TableRow, TextField,
+    TableRow, TextField, Tooltip,
 } from "@material-ui/core";
 import ErrorIcon from '@material-ui/icons/Error';
-import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
+import WatchLaterIcon from '@material-ui/icons/WatchLater';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import CancelIcon from '@material-ui/icons/Cancel';
+import HelpIcon from '@material-ui/icons/Help';
 import React from "react";
 import JobsListService from "../../jobs/list";
 import {Job} from "../../api-client";
@@ -83,10 +86,10 @@ class Dashboard extends React.Component<IDashboardProps, IDashboardState> {
                             <TableCell>Pulls</TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell><TextField id="filter-job" label="Filter by job" size={"small"} value={this.state.jobFilter} onChange={this.changeJobFilter} /></TableCell>
-                            <TableCell><TextField id="filter-repo" label="Filter by repository" size={"small"} value={this.state.repoFilter} /></TableCell>
-                            <TableCell />
-                            <TableCell />
+                            <TableCell colSpan={4}>
+                                <Box mr={2} component={"span"}><TextField id="filter-job" label="Filter by job" size={"small"} value={this.state.jobFilter} onChange={this.changeJobFilter} /></Box>
+                                <Box mr={2} component={"span"}><TextField id="filter-repo" label="Filter by repository" size={"small"} value={this.state.repoFilter} onChange={this.changeRepoFilter} /></Box>
+                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -108,8 +111,12 @@ class Dashboard extends React.Component<IDashboardProps, IDashboardState> {
                                         display: 'flex',
                                         alignItems: 'center',
                                         flexWrap: 'wrap',
-                                    }}>{job.job} {this.getJobStatus(job.status)}</TableCell>
-                                    <TableCell>{job.gitOrg != null && job.gitRepo != null?<a href={job.gitRepoLink} target="_blank" rel={"noreferrer noopener"}>{job.gitOrg}/{job.gitRepo}</a>:null}</TableCell>
+                                    }}>
+                                        {this.getJobStatus(job.status)} {job.job}
+                                    </TableCell>
+                                    <TableCell>
+                                        {job.gitOrg != null && job.gitRepo != null?<a href={job.gitRepoLink} target="_blank" rel={"noreferrer noopener"}>{job.gitOrg}/{job.gitRepo}</a>:null}
+                                    </TableCell>
                                     <TableCell>{job.gitBaseRef}</TableCell>
                                     <TableCell>{this.getPulls(job)}</TableCell>
                                 </TableRow>
@@ -124,13 +131,25 @@ class Dashboard extends React.Component<IDashboardProps, IDashboardState> {
     getJobStatus = (status: string) => {
         switch (status) {
             case "success":
-                return null
+                return <Tooltip title="Success" aria-label="success">
+                    <Box color="success.main" component={"span"} fontSize="small" style={{ marginRight: "0.5rem"}}><CheckCircleIcon /></Box>
+                </Tooltip>
             case "failure":
-                return <Box color="error.main" component={"span"} fontSize="small" style={{ marginLeft: "0.5rem"}}><ErrorIcon /></Box>
+                return <Tooltip title="Failure" aria-label="failure">
+                    <Box color="error.main" component={"span"} fontSize="small" style={{ marginRight: "0.5rem"}}><ErrorIcon /></Box>
+                </Tooltip>
             case "pending":
-                return <Box color="warning.main" component={"span"} fontSize="small" style={{ marginLeft: "0.5rem"}}><HourglassEmptyIcon /></Box>
+                return <Tooltip title="Pending" aria-label="pending">
+                    <Box color="warning.main" component={"span"} fontSize="small" style={{ marginRight: "0.5rem"}}><WatchLaterIcon /></Box>
+                </Tooltip>
+            case "aborted":
+                return <Tooltip title="Aborted" aria-label="aborted">
+                    <Box color="secondary.main" component={"span"} fontSize="small" style={{ marginRight: "0.5rem"}}><CancelIcon /></Box>
+                </Tooltip>
             default:
-                return null
+                return <Tooltip title={{ status }}>
+                    <Box color="secondary.main" component={"span"} fontSize="small" style={{ marginRight: "0.5rem"}}><HelpIcon /></Box>
+                </Tooltip>
         }
     }
 
