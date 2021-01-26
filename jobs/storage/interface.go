@@ -7,6 +7,8 @@ import (
 	"github.com/janoszen/openshiftci-inspector/jobs"
 )
 
+var ErrJobNotFound = errors.New("job not found")
+
 // JobsStorage stores a database of all jobs.
 type JobsStorage interface {
 	common.ShutdownHandler
@@ -16,6 +18,9 @@ type JobsStorage interface {
 
 	// ListJobs lists all jobs.
 	ListJobs() ([]jobs.Job, error)
+
+	// GetJob returns a single job.
+	GetJob(id string) (jobs.Job, error)
 }
 
 // JobHasNoAssetURL is an error that indicates that the specified job has no stored asset URL and the asset URL should

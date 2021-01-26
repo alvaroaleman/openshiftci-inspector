@@ -1,22 +1,19 @@
 import {
     Box,
-    LinearProgress,
+    LinearProgress, Link,
     Paper,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
-    TableRow, TextField, Tooltip,
+    TableRow, TextField,
 } from "@material-ui/core";
-import ErrorIcon from '@material-ui/icons/Error';
-import WatchLaterIcon from '@material-ui/icons/WatchLater';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import CancelIcon from '@material-ui/icons/Cancel';
-import HelpIcon from '@material-ui/icons/Help';
+import { Link as RouterLink } from 'react-router-dom';
 import React from "react";
-import JobsListService from "../../jobs/list";
+import JobsListService from "../list";
 import {Job} from "../../api-client";
+import JobStatus from "./JobStatus";
 
 interface IDashboardState {
     jobFilter: string,
@@ -30,7 +27,7 @@ interface IDashboardProps {
     jobsListService: JobsListService,
 }
 
-class Dashboard extends React.Component<IDashboardProps, IDashboardState> {
+export default class Dashboard extends React.Component<IDashboardProps, IDashboardState> {
 
     constructor(props: IDashboardProps) {
         super(props);
@@ -106,13 +103,16 @@ class Dashboard extends React.Component<IDashboardProps, IDashboardState> {
                             }
                             return true
                         }).map(job => {
-                                return <TableRow id={job.id}>
+                                return <TableRow key={job.id}>
                                     <TableCell style={{
                                         display: 'flex',
                                         alignItems: 'center',
                                         flexWrap: 'wrap',
                                     }}>
-                                        {this.getJobStatus(job.status)} {job.job}
+                                        <Box component={"span"} mr={1}><JobStatus status={job.status} fontSize={"inherit"} /></Box>
+                                        <Link component={RouterLink} to={"/" + job.id}>
+                                            {job.job}
+                                        </Link>
                                     </TableCell>
                                     <TableCell>
                                         {job.gitOrg != null && job.gitRepo != null?<a href={job.gitRepoLink} target="_blank" rel={"noreferrer noopener"}>{job.gitOrg}/{job.gitRepo}</a>:null}
@@ -128,39 +128,12 @@ class Dashboard extends React.Component<IDashboardProps, IDashboardState> {
         </Box>;
     }
 
-    getJobStatus = (status: string) => {
-        switch (status) {
-            case "success":
-                return <Tooltip title="Success" aria-label="success">
-                    <Box color="success.main" component={"span"} fontSize="small" style={{ marginRight: "0.5rem"}}><CheckCircleIcon /></Box>
-                </Tooltip>
-            case "failure":
-                return <Tooltip title="Failure" aria-label="failure">
-                    <Box color="error.main" component={"span"} fontSize="small" style={{ marginRight: "0.5rem"}}><ErrorIcon /></Box>
-                </Tooltip>
-            case "pending":
-                return <Tooltip title="Pending" aria-label="pending">
-                    <Box color="warning.main" component={"span"} fontSize="small" style={{ marginRight: "0.5rem"}}><WatchLaterIcon /></Box>
-                </Tooltip>
-            case "aborted":
-                return <Tooltip title="Aborted" aria-label="aborted">
-                    <Box color="secondary.main" component={"span"} fontSize="small" style={{ marginRight: "0.5rem"}}><CancelIcon /></Box>
-                </Tooltip>
-            default:
-                return <Tooltip title={{ status }}>
-                    <Box color="secondary.main" component={"span"} fontSize="small" style={{ marginRight: "0.5rem"}}><HelpIcon /></Box>
-                </Tooltip>
-        }
-    }
-
     getPulls = (job: Job) => {
         if (job.pulls == null) {
             return null
         }
         return job.pulls.map(pull => {
-            return <a href={pull.pullLink} target="_blank" rel={"noreferrer noopener"}>{pull.number}</a>
+            return <span><a href={pull.pullLink} target="_blank" rel={"noreferrer noopener"}>{pull.number}</a> by <a href={pull.authorLink} target="_blank" rel={"noreferrer noopener"}>{pull.author}</a></span>
         })
     }
 }
-
-export default Dashboard;

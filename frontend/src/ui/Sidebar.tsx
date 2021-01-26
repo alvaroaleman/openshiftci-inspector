@@ -1,11 +1,10 @@
 import { Divider } from "@blueprintjs/core";
-import {Box, List, ListItem, ListItemIcon, ListItemText, Typography} from "@material-ui/core";
+import {Box, Link, List, ListItem, ListItemIcon, ListItemText, Typography} from "@material-ui/core";
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import * as React from "react";
-import LinkFactory from "../router/ui/LinkFactory";
+import {Link as RouterLink} from "react-router-dom";
 
 export interface ISidebarProps {
-    linkFactory: LinkFactory
 }
 
 class Sidebar extends React.Component<ISidebarProps> {
@@ -19,11 +18,9 @@ class Sidebar extends React.Component<ISidebarProps> {
                 <ListItem button={true}>
                     <ListItemIcon><DashboardIcon /></ListItemIcon>
                     <ListItemText primary={
-                        this.props.linkFactory.create(
-                            "Home",
-                            "sidebar__link",
-                            "/"
-                        )
+                        <Link component={RouterLink} to={"/"}>
+                            Home
+                        </Link>
                     } />
                 </ListItem>
             </List>

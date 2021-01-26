@@ -1,7 +1,6 @@
-import {Job, JobsListResponseBody} from "../api-client";
+import {Job, JobsApi} from "../api-client";
 import {AbstractService} from "../service/service";
 import INotificationService, {NotificationType} from "../notification/service/INotificationService";
-import {AxiosPromise} from "axios";
 
 export default class JobsListService extends AbstractService {
     private loaded: boolean
@@ -9,7 +8,7 @@ export default class JobsListService extends AbstractService {
     private jobs: Array<Job> = new Array<Job>()
 
     constructor(
-        private api: { listJobs(options?: any): AxiosPromise<JobsListResponseBody> },
+        private api: JobsApi,
         private notificationService: INotificationService
     ) {
         super()

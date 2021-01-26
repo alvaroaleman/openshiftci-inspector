@@ -3,19 +3,21 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import Dashboard from "./dashboard/ui/Dashboard";
+import Dashboard from "./jobs/ui/Dashboard";
 import './index.css';
 import NotificationServiceFactory from "./notification/service/NotificationServiceFactory";
 import ToastHandlerFactory from "./notification/ui/ToastHandlerFactory";
-import BrowserHistoryServiceFactory from "./router/service/BrowserHistoryServiceFactory";
-import PageTitleServiceFactory from "./router/service/PageTitleServiceFactory";
-import RoutingServiceFactory from "./router/service/RoutingServiceFactory";
-import LinkFactory from "./router/ui/LinkFactory";
-import RouterFactory from "./router/ui/RouterFactory";
 import theme from './theme';
-import SidebarFactory from "./ui/SidebarFactory";
-import {Configuration, JobsApiFactory} from "./api-client";
+import {Configuration, JobsApi} from "./api-client";
 import JobsListService from "./jobs/list";
+import JobsGetService from "./jobs/get";
+import JobDetails from "./jobs/ui/JobDetails";
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+} from "react-router-dom";
+import {RouteComponentProps} from "react-router";
 
 const notificationServiceFactory = new NotificationServiceFactory();
 const toastHandlerFactory = new ToastHandlerFactory(
@@ -29,40 +31,29 @@ const baseURL = window.location.protocol + "//" + window.location.hostname + (
 const apiConfiguration = new Configuration({
     basePath: baseURL
 })
-const jobsAPI = JobsApiFactory(apiConfiguration)
+const jobsAPI = new JobsApi(apiConfiguration)
 const jobsListService = new JobsListService(jobsAPI, notificationServiceFactory.create())
-
-const routingServiceFactory = new RoutingServiceFactory(window.location.pathname);
-
-const titleServiceFactory = new PageTitleServiceFactory(
-    window
-);
-
-const routerFactory = new RouterFactory(
-    routingServiceFactory.create(),
-    titleServiceFactory.create()
-);
-
-const browserHistoryServiceFactory = new BrowserHistoryServiceFactory(
-    baseURL,
-    window,
-    routingServiceFactory.create()
-);
-browserHistoryServiceFactory.create().register();
-
-const linkFactory = new LinkFactory(routingServiceFactory.create());
-
-const sidebarFactory = new SidebarFactory(linkFactory);
+const jobsGetService = new JobsGetService(jobsAPI, notificationServiceFactory.create())
 
 ReactDOM.render(
     <ThemeProvider theme={theme}>
         <CssBaseline />
-        <App
-            toastHandler={toastHandlerFactory.create()}
-            sidebar={sidebarFactory.create()}
-        >
-            {routerFactory.create("/", "Dashboard", <Dashboard jobsListService={jobsListService}/>)}
-        </App>
+        <Router>
+            <App
+                toastHandler={toastHandlerFactory.create()}
+            >
+                <Switch>
+                    <Route exact path="/">
+                        <Dashboard jobsListService={jobsListService} />
+                    </Route>
+                    <Route exact path="/:id" component={jobDetailsRoute} />
+                </Switch>
+            </App>
+        </Router>
     </ThemeProvider>,
     document.getElementById('root') as HTMLElement
 );
+
+function jobDetailsRoute(props: RouteComponentProps<any>) {
+    return <JobDetails jobsGetService={jobsGetService} id={props.match.params.id} />
+}

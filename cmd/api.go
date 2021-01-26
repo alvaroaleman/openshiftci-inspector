@@ -47,6 +47,7 @@ func main() {
 
 	handlers := []api.API{
 		jobsAPI.NewJobsListAPI(jobsStorage),
+		jobsAPI.NewJobsGetAPI(jobsStorage),
 	}
 
 	srv, err := api.NewServer(

@@ -50,12 +50,15 @@ func (s *server) Start() error {
 	r := mux.NewRouter()
 	subrouters := map[string]*mux.Router{}
 	for _, handler := range s.handlers {
-		for _, route := range handler.GetRoutes() {
-			if _, ok := subrouters[route.Method]; !ok {
-				subrouters[route.Method] = r.Methods(route.Method).Subrouter()
+		h := handler
+		for _, route := range h.GetRoutes() {
+			method := route.Method
+			path := route.Path
+			if _, ok := subrouters[method]; !ok {
+				subrouters[method] = r.Methods(route.Method).Subrouter()
 			}
-			subrouters[route.Method].HandleFunc(
-				route.Path,
+			subrouters[method].HandleFunc(
+				path,
 				func(
 					writer http.ResponseWriter,
 					request *http.Request,
@@ -77,7 +80,7 @@ func (s *server) Start() error {
 								)
 							}
 						}()
-						err := handler.Handle(wrappedRequest, wrappedResponse)
+						err := h.Handle(wrappedRequest, wrappedResponse)
 						s.handleError(err, wrappedResponse)
 					}()
 					wg.Wait()

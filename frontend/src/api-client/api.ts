@@ -119,6 +119,19 @@ export interface Job {
 /**
  * 
  * @export
+ * @interface JobsGetResponseBody
+ */
+export interface JobsGetResponseBody {
+    /**
+     * 
+     * @type {Job}
+     * @memberof JobsGetResponseBody
+     */
+    job: Job;
+}
+/**
+ * 
+ * @export
  * @interface JobsListResponseBody
  */
 export interface JobsListResponseBody {
@@ -181,6 +194,49 @@ export const JobsApiAxiosParamCreator = function (configuration?: Configuration)
     return {
         /**
          * 
+         * @summary Get a single job by ID.
+         * @param {string} iD ID of the job to fetch.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getJob: async (iD: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'iD' is not null or undefined
+            if (iD === null || iD === undefined) {
+                throw new RequiredError('iD','Required parameter iD was null or undefined when calling getJob.');
+            }
+            const localVarPath = `/jobs/{ID}`
+                .replace(`{${"ID"}}`, encodeURIComponent(String(iD)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get a list of jobs currently stored.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -227,6 +283,20 @@ export const JobsApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @summary Get a single job by ID.
+         * @param {string} iD ID of the job to fetch.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getJob(iD: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<JobsGetResponseBody>> {
+            const localVarAxiosArgs = await JobsApiAxiosParamCreator(configuration).getJob(iD, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @summary Get a list of jobs currently stored.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -249,6 +319,16 @@ export const JobsApiFactory = function (configuration?: Configuration, basePath?
     return {
         /**
          * 
+         * @summary Get a single job by ID.
+         * @param {string} iD ID of the job to fetch.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getJob(iD: string, options?: any): AxiosPromise<JobsGetResponseBody> {
+            return JobsApiFp(configuration).getJob(iD, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get a list of jobs currently stored.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -266,6 +346,18 @@ export const JobsApiFactory = function (configuration?: Configuration, basePath?
  * @extends {BaseAPI}
  */
 export class JobsApi extends BaseAPI {
+    /**
+     * 
+     * @summary Get a single job by ID.
+     * @param {string} iD ID of the job to fetch.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof JobsApi
+     */
+    public getJob(iD: string, options?: any) {
+        return JobsApiFp(this.configuration).getJob(iD, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary Get a list of jobs currently stored.

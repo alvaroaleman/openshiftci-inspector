@@ -12,12 +12,14 @@ type request struct {
 
 func (r *request) Decode(target interface{}) error {
 	contentType := r.request.Header.Get("content-type")
+	bodyDecoded := false
 	for _, decoder := range r.decoders {
 		bodyDecoder := decoder.BodyDecoder()
 		var err error
 		if bodyDecoder != nil {
 			if contentType != "" && bodyDecoder.CanDecode(contentType) {
 				err = bodyDecoder.Decode(r.pathVars, r.request, target)
+				bodyDecoded = true
 			}
 		} else {
 			err = decoder.Decode(r.pathVars, r.request, target)
@@ -26,7 +28,11 @@ func (r *request) Decode(target interface{}) error {
 			return err
 		}
 	}
-	return &HttpError{
-		StatusCode: http.StatusUnsupportedMediaType,
+	if r.request.Method != "GET" && !bodyDecoded {
+		return &HttpError{
+			StatusCode: http.StatusUnsupportedMediaType,
+		}
+	} else {
+		return nil
 	}
 }

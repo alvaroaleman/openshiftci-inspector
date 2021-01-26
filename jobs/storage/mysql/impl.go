@@ -177,6 +177,78 @@ INSERT INTO jobs (
 	return nil
 }
 
+func (m *mysqlJobsStorage) GetJob(id string) (job jobs.Job, err error) {
+	var result *sql.Rows
+	result, err = m.db.Query(
+		// language=MySQL
+		`
+SELECT
+	id,
+    job,
+    job_name_safe,
+    status,
+    start_time,
+    pending_time,
+    completion_time,
+    url,
+    git_org,
+    git_repo,
+    git_repo_link,
+    git_base_ref,
+    git_base_sha,
+    git_base_link
+FROM jobs
+WHERE id=?
+LIMIT 1`,
+		id,
+	)
+	if err != nil {
+		return jobs.Job{}, err
+	}
+	if !result.Next() {
+		return jobs.Job{}, storage.ErrJobNotFound
+	}
+	job = jobs.Job{}
+	var startTime []uint8
+	var pendingTime []uint8
+	var completionTime []uint8
+	err = result.Scan(
+		&job.ID,
+		&job.Job,
+		&job.JobSafeName,
+		&job.Status,
+		&startTime,
+		&pendingTime,
+		&completionTime,
+		&job.URL,
+		&job.GitOrg,
+		&job.GitRepo,
+		&job.GitRepoLink,
+		&job.GitBaseRef,
+		&job.GitBaseSHA,
+		&job.GitBaseLink,
+	)
+	if err != nil {
+		return jobs.Job{}, fmt.Errorf("failed to fetch job row (%w)", err)
+	}
+	if job.StartTime, err = m.decodeTime(startTime); err != nil {
+		return jobs.Job{}, err
+	}
+	if job.PendingTime, err = m.decodeTime(pendingTime); err != nil {
+		return jobs.Job{}, err
+	}
+	if job.CompletionTime, err = m.decodeTime(completionTime); err != nil {
+		return jobs.Job{}, err
+	}
+
+	pulls, err := m.getJobPulls(job.ID)
+	if err != nil {
+		return jobs.Job{}, err
+	}
+	job.Pulls = pulls
+	return job, nil
+}
+
 func (m *mysqlJobsStorage) ListJobs() (jobList []jobs.Job, err error) {
 	var result *sql.Rows
 	result, err = m.db.Query(
