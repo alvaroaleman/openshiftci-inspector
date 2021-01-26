@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/janoszen/openshiftci-inspector/asset"
 	"github.com/janoszen/openshiftci-inspector/asset/indexstorage"
@@ -34,6 +35,14 @@ func (d *assetDownloader) Download(assets <-chan asset.AssetWithJob) {
 				response, err := d.client.Get(a.Job.AssetURL + a.AssetName)
 				if err != nil {
 					d.logger.Printf("Failed to download URL %s (%v).", a.Job.AssetURL+a.AssetName, err)
+					continue
+				}
+				if response.StatusCode != 200 {
+					d.logger.Printf("Failed to download URL %s (non-200 status code: %d).", a.Job.AssetURL+a.AssetName, response.StatusCode)
+					continue
+				}
+				if strings.Contains(response.Header.Get("Content-Type"), "text/html") {
+					d.logger.Printf("Failed to download URL %s (non-binary content type: %s).", a.Job.AssetURL+a.AssetName, response.Header.Get("Content-Type"))
 					continue
 				}
 				data, err := ioutil.ReadAll(response.Body)

@@ -1,6 +1,6 @@
 import {
     Box,
-    LinearProgress, Link,
+    LinearProgress,
     Paper,
     Table,
     TableBody,
@@ -9,11 +9,11 @@ import {
     TableHead,
     TableRow, TextField,
 } from "@material-ui/core";
-import { Link as RouterLink } from 'react-router-dom';
 import React from "react";
 import JobsListService from "../list";
 import {Job} from "../../api-client";
 import JobStatus from "./JobStatus";
+import Link from "../../common/Link"
 
 interface IDashboardState {
     jobFilter: string,
@@ -110,7 +110,7 @@ export default class Dashboard extends React.Component<IDashboardProps, IDashboa
                                         flexWrap: 'wrap',
                                     }}>
                                         <Box component={"span"} mr={1}><JobStatus status={job.status} fontSize={"inherit"} /></Box>
-                                        <Link component={RouterLink} to={"/" + job.id}>
+                                        <Link to={"/" + job.id}>
                                             {job.job}
                                         </Link>
                                     </TableCell>
