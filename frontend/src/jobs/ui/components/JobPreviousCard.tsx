@@ -6,7 +6,7 @@ import {
     Card,
     CardHeader,
     LinearProgress, Table, TableBody,
-    TableCell,
+    TableCell, TableContainer,
     TableHead,
     TableRow,
 } from "@material-ui/core";
@@ -62,27 +62,29 @@ export default class JobPreviousCard extends React.Component<IJobPreviousCardPro
             <Card>
                 {this.state.isRefreshing?<LinearProgress />:null}
                 <CardHeader title="Previous jobs" subheader={"Lists previous jobs for the same job type and repository."} />
-                <Table size="small">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Time</TableCell>
-                            <TableCell>Pulls</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {this.state.jobs.map(job => {
-                            return <TableRow key={job.id}>
-                                <TableCell>
-                                    <Box component={"span"} mr={1}><JobStatus status={job.status} fontSize={"inherit"} /></Box>
-                                    <Link to={"/" + job.id}>
-                                        <JobTime time={job.startTime} />
-                                    </Link>
-                                </TableCell>
-                                <TableCell>{this.getPulls(job)}</TableCell>
+                <TableContainer style={{height:"500px"}}>
+                    <Table size="small" stickyHeader>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Time</TableCell>
+                                <TableCell>Pulls</TableCell>
                             </TableRow>
-                        })}
-                    </TableBody>
-                </Table>
+                        </TableHead>
+                        <TableBody>
+                            {this.state.jobs.map(job => {
+                                return <TableRow key={job.id}>
+                                    <TableCell>
+                                        <Box component={"span"} mr={1}><JobStatus status={job.status} fontSize={"inherit"} /></Box>
+                                        <Link to={"/" + job.id}>
+                                            <JobTime time={job.startTime} />
+                                        </Link>
+                                    </TableCell>
+                                    <TableCell>{this.getPulls(job)}</TableCell>
+                                </TableRow>
+                            })}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </Card>
         </React.Fragment>
     }

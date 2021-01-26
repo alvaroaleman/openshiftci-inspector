@@ -6,7 +6,7 @@ import {
     Card,
     CardHeader,
     LinearProgress, Table, TableBody,
-    TableCell,
+    TableCell, TableContainer,
     TableHead,
     TableRow,
 } from "@material-ui/core";
@@ -62,33 +62,35 @@ export default class JobRelatedCard extends React.Component<IJobRelatedCardProps
             <Card>
                 {this.state.isRefreshing?<LinearProgress />:null}
                 <CardHeader title="Related jobs" subheader={"Lists other jobs for the same repository, base, and pull request ID."} />
-                <Table size="small">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Job</TableCell>
-                            <TableCell>Start time</TableCell>
-                            <TableCell>Git repository</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {this.state.jobs.map(job => {
-                            return <TableRow key={job.id}>
-                                <TableCell>
-                                    <Box component={"span"} mr={1}><JobStatus status={job.status} fontSize={"inherit"} /></Box>
-                                    <Link to={"/" + job.id}>
-                                        {job.job}
-                                    </Link>
-                                </TableCell>
-                                <TableCell>
-                                    <JobTime time={job.startTime} />
-                                </TableCell>
-                                <TableCell>
-                                    {job.gitOrg != null && job.gitRepo != null?<a href={job.gitRepoLink} target="_blank" rel={"noreferrer noopener"}>{job.gitOrg}/{job.gitRepo}</a>:null}
-                                </TableCell>
+                <TableContainer style={{height: "500px"}}>
+                    <Table size="small" stickyHeader>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Job</TableCell>
+                                <TableCell>Start</TableCell>
+                                <TableCell>Git repository</TableCell>
                             </TableRow>
-                        })}
-                    </TableBody>
-                </Table>
+                        </TableHead>
+                        <TableBody>
+                            {this.state.jobs.map(job => {
+                                return <TableRow key={job.id}>
+                                    <TableCell>
+                                        <Box component={"span"} mr={1}><JobStatus status={job.status} fontSize={"inherit"} /></Box>
+                                        <Link to={"/" + job.id}>
+                                            {job.job}
+                                        </Link>
+                                    </TableCell>
+                                    <TableCell>
+                                        <JobTime time={job.startTime} />
+                                    </TableCell>
+                                    <TableCell>
+                                        {job.gitOrg != null && job.gitRepo != null?<a href={job.gitRepoLink} target="_blank" rel={"noreferrer noopener"}>{job.gitOrg}/{job.gitRepo}</a>:null}
+                                    </TableCell>
+                                </TableRow>
+                            })}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </Card>
         </React.Fragment>
     }

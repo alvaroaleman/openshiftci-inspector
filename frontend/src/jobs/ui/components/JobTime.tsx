@@ -37,5 +37,5 @@ export default function JobTime(props: IJobTimeProps) {
         return <span>&mdash;</span>
     }
     const parsedTime = Date.parse(props.time)
-    return <Tooltip title={props.time}><span>{timeSince(new Date().getTime(), parsedTime)} ago</span></Tooltip>
+    return <Tooltip title={props.time}><span><span style={{whiteSpace:"nowrap"}}>{timeSince(new Date().getTime(), parsedTime)}</span> ago</span></Tooltip>
 }

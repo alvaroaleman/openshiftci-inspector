@@ -55,7 +55,7 @@ func (j *jobsGetRelatedAPI) Handle(apiRequest api.Request, response api.Response
 	}
 
 	var pullNumber *int
-	if job.Pulls != nil {
+	if job.Pulls != nil && len(job.Pulls) > 0 {
 		pullNumber = &job.Pulls[0].Number
 	}
 
