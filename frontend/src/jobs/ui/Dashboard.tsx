@@ -74,7 +74,7 @@ export default class Dashboard extends React.Component<IDashboardProps, IDashboa
         return <Box m={2}>
             <TableContainer component={Paper}>
                 {this.state.isRefreshing?<LinearProgress />:null}
-                <Table aria-label="simple table" size="small">
+                <Table size="small">
                     <TableHead>
                         <TableRow>
                             <TableCell>Job</TableCell>
@@ -133,7 +133,7 @@ export default class Dashboard extends React.Component<IDashboardProps, IDashboa
             return null
         }
         return job.pulls.map(pull => {
-            return <span><a href={pull.pullLink} target="_blank" rel={"noreferrer noopener"}>{pull.number}</a> by <a href={pull.authorLink} target="_blank" rel={"noreferrer noopener"}>{pull.author}</a></span>
+            return <span key={pull.number}><a href={pull.pullLink} target="_blank" rel={"noreferrer noopener"}>{pull.number}</a> by <a href={pull.authorLink} target="_blank" rel={"noreferrer noopener"}>{pull.author}</a></span>
         })
     }
 }

@@ -14,6 +14,7 @@ import {
 } from "@material-ui/core";
 import LaunchIcon from '@material-ui/icons/Launch';
 import JobStatus from "./JobStatus";
+import JobTime from "./JobTime";
 
 interface IJobDetailsState {
     isLoaded: boolean,
@@ -72,45 +73,47 @@ export default class JobDetails extends React.Component<IJobDetailsProps, IJobDe
                 <CardContent>
                     <Grid container spacing={2}>
                         <Grid item xs={6}>
-                            <Table>
+                            <Table size="small">
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell>Status:</TableCell>
+                                        <TableCell><strong>Status:</strong></TableCell>
                                         <TableCell>{job.status}</TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell>Start time:</TableCell>
-                                        <TableCell>{job.startTime}</TableCell>
+                                        <TableCell><strong>Start time:</strong></TableCell>
+                                        <TableCell><JobTime time={job.startTime} /></TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell>Pending time:</TableCell>
-                                        <TableCell>{job.pendingTime}</TableCell>
+                                        <TableCell><strong>Pending time:</strong></TableCell>
+                                        <TableCell><JobTime time={job.pendingTime} /></TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell>Completion time:</TableCell>
-                                        <TableCell>{job.completionTime}</TableCell>
+                                        <TableCell><strong>Completion time:</strong></TableCell>
+                                        <TableCell><JobTime time={job.completionTime} /></TableCell>
                                     </TableRow>
                                 </TableBody>
                             </Table>
                         </Grid>
                         <Grid item xs={6}>
-                            <Table>
+                            <Table size="small">
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell>Repository:</TableCell>
+                                        <TableCell><strong>Repository:</strong></TableCell>
                                         <TableCell>{job.gitOrg != null && job.gitRepo != null?<a href={job.gitRepoLink} target="_blank" rel={"noreferrer noopener"}>{job.gitOrg}/{job.gitRepo} <LaunchIcon style={{fontSize:"1em"}} /></a>:null}</TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell>Base ref:</TableCell>
+                                        <TableCell><strong>Base ref:</strong></TableCell>
                                         <TableCell>{job.gitBaseRef}</TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell>Pulls:</TableCell>
+                                        <TableCell><strong>Pulls:</strong></TableCell>
                                         <TableCell>{this.getPulls()}</TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell>Prow:</TableCell>
-                                        <TableCell><a href={job.url}  target="_blank" rel={"noreferrer noopener"}>Open <LaunchIcon style={{fontSize:"1em"}} /></a></TableCell>
+                                        <TableCell><strong>Links:</strong></TableCell>
+                                        <TableCell>
+                                            <a href={job.url}  target="_blank" rel={"noreferrer noopener"}>Prow <LaunchIcon style={{fontSize:"1em"}} /></a>
+                                        </TableCell>
                                     </TableRow>
                                 </TableBody>
                             </Table>
