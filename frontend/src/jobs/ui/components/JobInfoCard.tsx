@@ -36,7 +36,17 @@ export default class JobInfoCard extends React.Component<IJobInfoCardProps, IJob
         }
     }
 
-    componentDidMount = async () => {
+    componentDidMount = () => {
+        this.reload()
+    }
+
+    componentDidUpdate = (prevProps: Readonly<IJobInfoCardProps>, prevState: Readonly<IJobInfoCardState>, snapshot?: any) => {
+        if (prevProps.id !== this.props.id) {
+            this.reload()
+        }
+    }
+
+    reload = async () => {
         this.setState({
             isRefreshing: true
         })
@@ -126,7 +136,7 @@ export default class JobInfoCard extends React.Component<IJobInfoCardProps, IJob
             return null
         }
         return job.pulls.map(pull => {
-            return <span><a href={pull.pullLink} target="_blank" rel={"noreferrer noopener"}>{pull.number} <LaunchIcon style={{fontSize:"1em"}} /></a> by <a href={pull.authorLink} target="_blank" rel={"noreferrer noopener"}>{pull.author} <LaunchIcon style={{fontSize:"1em"}} /></a></span>
+            return <span key={pull.number}><a href={pull.pullLink} target="_blank" rel={"noreferrer noopener"}>{pull.number} <LaunchIcon style={{fontSize:"1em"}} /></a> by <a href={pull.authorLink} target="_blank" rel={"noreferrer noopener"}>{pull.author} <LaunchIcon style={{fontSize:"1em"}} /></a></span>
         })
     }
 }

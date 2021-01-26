@@ -35,7 +35,17 @@ export default class JobPreviousCard extends React.Component<IJobPreviousCardPro
         }
     }
 
-    componentDidMount = async () => {
+    componentDidMount = () => {
+        this.reload()
+    }
+
+    componentDidUpdate = (prevProps: Readonly<IJobPreviousCardProps>, prevState: Readonly<IJobPreviousCardState>, snapshot?: any) => {
+        if (prevProps.id !== this.props.id) {
+            this.reload()
+        }
+    }
+
+    reload = async () => {
         this.setState({
             isRefreshing: true
         })
