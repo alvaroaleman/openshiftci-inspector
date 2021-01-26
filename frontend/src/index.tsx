@@ -3,7 +3,7 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import Dashboard from "./jobs/ui/Dashboard";
+import JobDashboardPage from "./jobs/ui/JobDashboardPage";
 import './index.css';
 import NotificationServiceFactory from "./notification/service/NotificationServiceFactory";
 import ToastHandlerFactory from "./notification/ui/ToastHandlerFactory";
@@ -11,13 +11,15 @@ import theme from './theme';
 import {Configuration, JobsApi} from "./api-client";
 import JobsListService from "./jobs/list";
 import JobsGetService from "./jobs/get";
-import JobDetails from "./jobs/ui/JobDetails";
+import JobDetailsPage from "./jobs/ui/JobDetailsPage";
 import {
     BrowserRouter as Router,
     Switch,
     Route,
 } from "react-router-dom";
 import {RouteComponentProps} from "react-router";
+import JobsGetPreviousService from "./jobs/previous";
+import JobsGetRelatedService from "./jobs/related";
 
 const notificationServiceFactory = new NotificationServiceFactory();
 const toastHandlerFactory = new ToastHandlerFactory(
@@ -34,6 +36,8 @@ const apiConfiguration = new Configuration({
 const jobsAPI = new JobsApi(apiConfiguration)
 const jobsListService = new JobsListService(jobsAPI, notificationServiceFactory.create())
 const jobsGetService = new JobsGetService(jobsAPI, notificationServiceFactory.create())
+const jobsGetPreviousService = new JobsGetPreviousService(jobsAPI, notificationServiceFactory.create())
+const jobsGetRelatedService = new JobsGetRelatedService(jobsAPI, notificationServiceFactory.create())
 
 ReactDOM.render(
     <ThemeProvider theme={theme}>
@@ -44,7 +48,7 @@ ReactDOM.render(
             >
                 <Switch>
                     <Route exact path="/">
-                        <Dashboard jobsListService={jobsListService} />
+                        <JobDashboardPage jobsListService={jobsListService} />
                     </Route>
                     <Route exact path="/:id" component={jobDetailsRoute} />
                 </Switch>
@@ -55,5 +59,10 @@ ReactDOM.render(
 );
 
 function jobDetailsRoute(props: RouteComponentProps<any>) {
-    return <JobDetails jobsGetService={jobsGetService} id={props.match.params.id} />
+    return <JobDetailsPage
+        jobsGetService={jobsGetService}
+        id={props.match.params.id}
+        jobsGetPreviousService={jobsGetPreviousService}
+        jobsGetRelatedService={jobsGetRelatedService}
+    />
 }

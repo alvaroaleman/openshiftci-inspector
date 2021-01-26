@@ -112,7 +112,6 @@ INSERT INTO job_pulls (
 		pull.PullLink,
 		pull.CommitLink,
 		pull.AuthorLink,
-
 		pull.Author,
 		pull.SHA,
 		pull.PullLink,
@@ -249,27 +248,60 @@ LIMIT 1`,
 	return job, nil
 }
 
-func (m *mysqlJobsStorage) ListJobs() (jobList []jobs.Job, err error) {
+func (m *mysqlJobsStorage) ListJobs(params storage.ListJobsParams) (jobList []jobs.Job, err error) {
+	where := ""
+	var whereClauses []string
+	var whereParams []interface{}
+	if params.Job != nil {
+		whereClauses = append(whereClauses, "job = ?")
+		whereParams = append(whereParams, *params.Job)
+	}
+	if params.GitRepo != nil {
+		whereClauses = append(whereClauses, "git_repo = ?")
+		whereParams = append(whereParams, *params.GitRepo)
+	}
+	if params.GitOrg != nil {
+		whereClauses = append(whereClauses, "git_org = ?")
+		whereParams = append(whereParams, *params.GitOrg)
+	}
+	if params.PullNumber != nil {
+		whereClauses = append(whereClauses, "job_pulls.number = ?")
+		whereParams = append(whereParams, *params.PullNumber)
+		where = " LEFT JOIN job_pulls ON job_pulls.job_id=jobs.id"
+	}
+	if params.Before != nil {
+		whereClauses = append(whereClauses, "start_time < ?")
+		whereParams = append(whereParams, *params.Before)
+	}
+	if params.After != nil {
+		whereClauses = append(whereClauses, "start_time > ?")
+		whereParams = append(whereParams, *params.After)
+	}
+
+	if len(whereClauses) > 0 {
+		where += " WHERE " + strings.Join(whereClauses, " AND ")
+	}
+
 	var result *sql.Rows
 	result, err = m.db.Query(
-		// language=MySQL
 		`
 SELECT
-	id,
-    job,
-    job_name_safe,
-    status,
-    start_time,
-    pending_time,
-    completion_time,
-    url,
-    git_org,
-    git_repo,
-    git_repo_link,
-    git_base_ref,
-    git_base_sha,
-    git_base_link
-FROM jobs`,
+	jobs.id,
+    jobs.job,
+    jobs.job_name_safe,
+    jobs.status,
+    jobs.start_time,
+    jobs.pending_time,
+    jobs.completion_time,
+    jobs.url,
+    jobs.git_org,
+    jobs.git_repo,
+    jobs.git_repo_link,
+    jobs.git_base_ref,
+    jobs.git_base_sha,
+    jobs.git_base_link
+FROM jobs`+where+` ORDER BY jobs.start_time DESC`,
+		whereParams...,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list jobs (%w)", err)

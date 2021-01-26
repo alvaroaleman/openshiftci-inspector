@@ -2,12 +2,22 @@ package storage
 
 import (
 	"errors"
+	"time"
 
 	"github.com/janoszen/openshiftci-inspector/common"
 	"github.com/janoszen/openshiftci-inspector/jobs"
 )
 
 var ErrJobNotFound = errors.New("job not found")
+
+type ListJobsParams struct {
+	Job        *string
+	GitOrg     *string
+	GitRepo    *string
+	PullNumber *int
+	Before     *time.Time
+	After      *time.Time
+}
 
 // JobsStorage stores a database of all jobs.
 type JobsStorage interface {
@@ -17,7 +27,7 @@ type JobsStorage interface {
 	UpdateJob(job jobs.Job) (err error)
 
 	// ListJobs lists all jobs.
-	ListJobs() ([]jobs.Job, error)
+	ListJobs(ListJobsParams) ([]jobs.Job, error)
 
 	// GetJob returns a single job.
 	GetJob(id string) (jobs.Job, error)

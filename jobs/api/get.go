@@ -47,10 +47,10 @@ func (j *jobsGetAPI) GetRoutes() []api.Route {
 // Schemes: http
 //
 // Responses:
-// default: JobsGetResponse
+// default: SingleJobResponse
 //
 func (j *jobsGetAPI) Handle(apiRequest api.Request, response api.Response) error {
-	request := JobsGetRequest{}
+	request := JobsIDRequest{}
 	if err := apiRequest.Decode(&request); err != nil {
 		return err
 	}
@@ -62,42 +62,11 @@ func (j *jobsGetAPI) Handle(apiRequest api.Request, response api.Response) error
 	if err != nil && !errors.Is(err, storage.ErrJobHasNoAssetURL) {
 		return err
 	}
-	return response.Encode(JobsGetResponseBody{
-		Job: jobs.JobWithAssetURL{
-			Job:      job,
-			AssetURL: assetURL,
-		},
-	})
-}
-
-// JobsGetRequest is a request to fetch a single job.
-//
-// swagger:parameters getJob
-type JobsGetRequest struct {
-	// ID of the job to fetch.
-	//
-	// In: path
-	// required: true
-	ID string `path:"id"`
-}
-
-// JobsGetResponse is the response to a request to get a single job in the Openshift CI.
-//
-// swagger:response JobsGetResponse
-type JobsGetResponse struct {
-	// JobsGetResponseBody is the response body.
-	//
-	// In: body
-	// required: true
-	JobsGetResponseBody JobsGetResponseBody `json:",inline"`
-}
-
-// JobsGetResponseBody represents a response with a single job.
-//
-// swagger:model JobsGetResponseBody
-type JobsGetResponseBody struct {
-	// Job is a single job record.
-	//
-	// required: true
-	Job jobs.JobWithAssetURL `json:"job"`
+	return response.Encode(
+		SingleJobResponseBody{
+			Job: jobs.JobWithAssetURL{
+				Job:      job,
+				AssetURL: assetURL,
+			},
+		})
 }

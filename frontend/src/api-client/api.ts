@@ -222,19 +222,6 @@ export interface JobWithAssetURL {
 /**
  * 
  * @export
- * @interface JobsGetResponseBody
- */
-export interface JobsGetResponseBody {
-    /**
-     * 
-     * @type {JobWithAssetURL}
-     * @memberof JobsGetResponseBody
-     */
-    job: JobWithAssetURL;
-}
-/**
- * 
- * @export
  * @interface JobsListResponseBody
  */
 export interface JobsListResponseBody {
@@ -288,6 +275,19 @@ export interface Pull {
      */
     sha: string;
 }
+/**
+ * 
+ * @export
+ * @interface SingleJobResponseBody
+ */
+export interface SingleJobResponseBody {
+    /**
+     * 
+     * @type {JobWithAssetURL}
+     * @memberof SingleJobResponseBody
+     */
+    job: JobWithAssetURL;
+}
 
 /**
  * JobsApi - axios parameter creator
@@ -308,6 +308,92 @@ export const JobsApiAxiosParamCreator = function (configuration?: Configuration)
                 throw new RequiredError('iD','Required parameter iD was null or undefined when calling getJob.');
             }
             const localVarPath = `/jobs/{ID}`
+                .replace(`{${"ID"}}`, encodeURIComponent(String(iD)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Returns a list of previous jobs for the same build and branch.
+         * @param {string} iD ID of the job to fetch.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPreviousJobs: async (iD: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'iD' is not null or undefined
+            if (iD === null || iD === undefined) {
+                throw new RequiredError('iD','Required parameter iD was null or undefined when calling getPreviousJobs.');
+            }
+            const localVarPath = `/jobs/{ID}/previous`
+                .replace(`{${"ID"}}`, encodeURIComponent(String(iD)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Returns a list of related jobs for the same build and branch.
+         * @param {string} iD ID of the job to fetch.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRelatedJobs: async (iD: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'iD' is not null or undefined
+            if (iD === null || iD === undefined) {
+                throw new RequiredError('iD','Required parameter iD was null or undefined when calling getRelatedJobs.');
+            }
+            const localVarPath = `/jobs/{ID}/related`
                 .replace(`{${"ID"}}`, encodeURIComponent(String(iD)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -391,8 +477,36 @@ export const JobsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getJob(iD: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<JobsGetResponseBody>> {
+        async getJob(iD: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SingleJobResponseBody>> {
             const localVarAxiosArgs = await JobsApiAxiosParamCreator(configuration).getJob(iD, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @summary Returns a list of previous jobs for the same build and branch.
+         * @param {string} iD ID of the job to fetch.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getPreviousJobs(iD: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<JobsListResponseBody>> {
+            const localVarAxiosArgs = await JobsApiAxiosParamCreator(configuration).getPreviousJobs(iD, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @summary Returns a list of related jobs for the same build and branch.
+         * @param {string} iD ID of the job to fetch.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRelatedJobs(iD: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<JobsListResponseBody>> {
+            const localVarAxiosArgs = await JobsApiAxiosParamCreator(configuration).getRelatedJobs(iD, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -427,8 +541,28 @@ export const JobsApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getJob(iD: string, options?: any): AxiosPromise<JobsGetResponseBody> {
+        getJob(iD: string, options?: any): AxiosPromise<SingleJobResponseBody> {
             return JobsApiFp(configuration).getJob(iD, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Returns a list of previous jobs for the same build and branch.
+         * @param {string} iD ID of the job to fetch.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPreviousJobs(iD: string, options?: any): AxiosPromise<JobsListResponseBody> {
+            return JobsApiFp(configuration).getPreviousJobs(iD, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Returns a list of related jobs for the same build and branch.
+         * @param {string} iD ID of the job to fetch.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRelatedJobs(iD: string, options?: any): AxiosPromise<JobsListResponseBody> {
+            return JobsApiFp(configuration).getRelatedJobs(iD, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -459,6 +593,30 @@ export class JobsApi extends BaseAPI {
      */
     public getJob(iD: string, options?: any) {
         return JobsApiFp(this.configuration).getJob(iD, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Returns a list of previous jobs for the same build and branch.
+     * @param {string} iD ID of the job to fetch.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof JobsApi
+     */
+    public getPreviousJobs(iD: string, options?: any) {
+        return JobsApiFp(this.configuration).getPreviousJobs(iD, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Returns a list of related jobs for the same build and branch.
+     * @param {string} iD ID of the job to fetch.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof JobsApi
+     */
+    public getRelatedJobs(iD: string, options?: any) {
+        return JobsApiFp(this.configuration).getRelatedJobs(iD, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

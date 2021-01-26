@@ -1,6 +1,6 @@
 import React from "react";
-import JobsGetService from "../get";
-import {JobWithAssetURL} from "../../api-client";
+import JobsGetService from "../../get";
+import {JobWithAssetURL} from "../../../api-client";
 import {
     Box, Button,
     Card, CardActions,
@@ -16,19 +16,19 @@ import LaunchIcon from '@material-ui/icons/Launch';
 import JobStatus from "./JobStatus";
 import JobTime from "./JobTime";
 
-interface IJobDetailsState {
+interface IJobInfoCardState {
     isLoaded: boolean,
     isRefreshing: boolean,
     job?: JobWithAssetURL,
 }
 
-interface IJobDetailsProps {
+interface IJobInfoCardProps {
     id: string
     jobsGetService: JobsGetService
 }
 
-export default class JobDetails extends React.Component<IJobDetailsProps, IJobDetailsState> {
-    constructor(props: IJobDetailsProps) {
+export default class JobInfoCard extends React.Component<IJobInfoCardProps, IJobInfoCardState> {
+    constructor(props: IJobInfoCardProps) {
         super(props);
         this.state = {
             isLoaded: false,
@@ -48,14 +48,6 @@ export default class JobDetails extends React.Component<IJobDetailsProps, IJobDe
         })
     }
 
-    componentWillUnmount = () => {
-    }
-
-    update = () => {
-        this.setState({
-        })
-    }
-
     render = () => {
         if (this.state.isRefreshing) {
             return <Box m={4} display="flex" alignItems="center" justifyContent="center"><CircularProgress /></Box>
@@ -67,7 +59,7 @@ export default class JobDetails extends React.Component<IJobDetailsProps, IJobDe
             return <Typography component={"h1"}>Job not found</Typography>
         }
         const job = this.state.job
-        return <Box m={2}>
+        return <React.Fragment>
             <Card>
                 <CardHeader avatar={<JobStatus status={job.status} fontSize={"inherit"} />} title={this.state.job.job} />
                 <CardContent>
@@ -125,7 +117,7 @@ export default class JobDetails extends React.Component<IJobDetailsProps, IJobDe
                     }
                 </CardActions>
             </Card>
-        </Box>
+        </React.Fragment>
     }
 
     getPulls = () => {

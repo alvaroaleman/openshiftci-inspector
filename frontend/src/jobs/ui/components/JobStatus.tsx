@@ -5,7 +5,7 @@ import WatchLaterIcon from "@material-ui/icons/WatchLater";
 import CancelIcon from "@material-ui/icons/Cancel";
 import HelpIcon from "@material-ui/icons/Help";
 import React from "react";
-import theme from "../../theme"
+import theme from "../../../theme"
 
 export interface IJobStatusProps{
     status: string

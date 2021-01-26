@@ -12,7 +12,7 @@ import {
 import React from "react";
 import JobsListService from "../list";
 import {Job} from "../../api-client";
-import JobStatus from "./JobStatus";
+import JobStatus from "./components/JobStatus";
 import Link from "../../common/Link"
 
 interface IDashboardState {
@@ -27,7 +27,7 @@ interface IDashboardProps {
     jobsListService: JobsListService,
 }
 
-export default class Dashboard extends React.Component<IDashboardProps, IDashboardState> {
+export default class JobDashboardPage extends React.Component<IDashboardProps, IDashboardState> {
 
     constructor(props: IDashboardProps) {
         super(props);
