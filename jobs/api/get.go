@@ -1,19 +1,26 @@
 package api
 
 import (
+	"errors"
+
 	"github.com/janoszen/openshiftci-inspector/common/api"
 	"github.com/janoszen/openshiftci-inspector/jobs"
 	"github.com/janoszen/openshiftci-inspector/jobs/storage"
 )
 
-func NewJobsGetAPI(jobsStorage storage.JobsStorage) api.API {
+func NewJobsGetAPI(
+	jobsStorage storage.JobsStorage,
+	assetURLStorage storage.JobsAssetURLStorage,
+) api.API {
 	return &jobsGetAPI{
-		storage: jobsStorage,
+		storage:         jobsStorage,
+		assetURLStorage: assetURLStorage,
 	}
 }
 
 type jobsGetAPI struct {
-	storage storage.JobsStorage
+	storage         storage.JobsStorage
+	assetURLStorage storage.JobsAssetURLStorage
 }
 
 func (j *jobsGetAPI) GetRoutes() []api.Route {
@@ -51,8 +58,15 @@ func (j *jobsGetAPI) Handle(apiRequest api.Request, response api.Response) error
 	if err != nil {
 		return err
 	}
+	assetURL, err := j.assetURLStorage.GetAssetURLForJob(job)
+	if err != nil && !errors.Is(err, storage.ErrJobHasNoAssetURL) {
+		return err
+	}
 	return response.Encode(JobsGetResponseBody{
-		Job: job,
+		Job: jobs.JobWithAssetURL{
+			Job:      job,
+			AssetURL: assetURL,
+		},
 	})
 }
 
@@ -85,5 +99,5 @@ type JobsGetResponseBody struct {
 	// Job is a single job record.
 	//
 	// required: true
-	Job jobs.Job `json:"job"`
+	Job jobs.JobWithAssetURL `json:"job"`
 }

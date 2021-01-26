@@ -23,9 +23,9 @@ type JobsStorage interface {
 	GetJob(id string) (jobs.Job, error)
 }
 
-// JobHasNoAssetURL is an error that indicates that the specified job has no stored asset URL and the asset URL should
+// ErrJobHasNoAssetURL is an error that indicates that the specified job has no stored asset URL and the asset URL should
 // be fetched from the job URL.
-var JobHasNoAssetURL = errors.New("the requested job has no asset URL")
+var ErrJobHasNoAssetURL = errors.New("the requested job has no asset URL")
 
 // JobsAssetURLStorage is a storage interface that lets you update and fetch the asset URL.
 type JobsAssetURLStorage interface {
@@ -34,7 +34,7 @@ type JobsAssetURLStorage interface {
 	// UpdateAssetURL sets the assetURL to the specified value for a job.
 	UpdateAssetURL(job jobs.Job, assetURL string) error
 
-	// GetAssetURLForJob returns the asset URL for a job if present or a JobHasNoAssetURL if not found. It can also
+	// GetAssetURLForJob returns the asset URL for a job if present or a ErrJobHasNoAssetURL if not found. It can also
 	// return other errors if the fetch failed.
 	GetAssetURLForJob(job jobs.Job) (assetURL string, err error)
 }

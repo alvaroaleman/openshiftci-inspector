@@ -38,7 +38,7 @@ func (c *cachingJobsAssetURLFetcher) Process(input <-chan jobs.Job) <-chan jobs.
 			c.logger.Println("Fetching asset URL for job " + job.ID + "...")
 			assetURL, err := c.storage.GetAssetURLForJob(job)
 			if err != nil {
-				if errors.Is(err, storage.JobHasNoAssetURL) {
+				if errors.Is(err, storage.ErrJobHasNoAssetURL) {
 					backendQueue <- job
 					jobResult, ok := <-backendReturn
 					if !ok {

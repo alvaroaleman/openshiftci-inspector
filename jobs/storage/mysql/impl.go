@@ -41,14 +41,14 @@ func (m *mysqlJobsStorage) GetAssetURLForJob(job jobs.Job) (assetURL string, err
 		_ = result.Close()
 	}()
 	if !result.Next() {
-		return "", storage.JobHasNoAssetURL
+		return "", storage.ErrJobHasNoAssetURL
 	}
 	var url *string
 	if err := result.Scan(&url); err != nil {
 		return "", err
 	}
 	if url == nil || *url == "" {
-		return "", storage.JobHasNoAssetURL
+		return "", storage.ErrJobHasNoAssetURL
 	}
 	return *url, nil
 }

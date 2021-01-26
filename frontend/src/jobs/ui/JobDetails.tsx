@@ -1,9 +1,9 @@
 import React from "react";
 import JobsGetService from "../get";
-import {Job} from "../../api-client";
+import {JobWithAssetURL} from "../../api-client";
 import {
-    Box,
-    Card,
+    Box, Button,
+    Card, CardActions,
     CardContent, CardHeader,
     CircularProgress,
     Grid,
@@ -19,7 +19,7 @@ import JobTime from "./JobTime";
 interface IJobDetailsState {
     isLoaded: boolean,
     isRefreshing: boolean,
-    job?: Job,
+    job?: JobWithAssetURL,
 }
 
 interface IJobDetailsProps {
@@ -109,17 +109,21 @@ export default class JobDetails extends React.Component<IJobDetailsProps, IJobDe
                                         <TableCell><strong>Pulls:</strong></TableCell>
                                         <TableCell>{this.getPulls()}</TableCell>
                                     </TableRow>
-                                    <TableRow>
-                                        <TableCell><strong>Links:</strong></TableCell>
-                                        <TableCell>
-                                            <a href={job.url}  target="_blank" rel={"noreferrer noopener"}>Prow <LaunchIcon style={{fontSize:"1em"}} /></a>
-                                        </TableCell>
-                                    </TableRow>
                                 </TableBody>
                             </Table>
                         </Grid>
                     </Grid>
                 </CardContent>
+                <CardActions>
+                    <a href={job.url}  target="_blank" rel={"noreferrer noopener"}>
+                        <Button variant="contained" color="primary" size={"small"}>Open in Prow&nbsp;<LaunchIcon style={{fontSize:"1em"}} /></Button>
+                    </a>
+                    {!job.assetURL?null:
+                        <a href={job.assetURL}  target="_blank" rel={"noreferrer noopener"}>
+                            <Button variant="contained" color="primary" size={"small"}>Artifacts&nbsp;<LaunchIcon style={{fontSize:"1em"}} /></Button>
+                        </a>
+                    }
+                </CardActions>
             </Card>
         </Box>
     }

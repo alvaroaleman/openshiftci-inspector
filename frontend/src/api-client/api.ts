@@ -119,15 +119,118 @@ export interface Job {
 /**
  * 
  * @export
+ * @interface JobWithAssetURL
+ */
+export interface JobWithAssetURL {
+    /**
+     * AssetURL is the base URL for all assets.
+     * @type {string}
+     * @memberof JobWithAssetURL
+     */
+    assetURL?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobWithAssetURL
+     */
+    completionTime?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobWithAssetURL
+     */
+    gitBaseLink?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobWithAssetURL
+     */
+    gitBaseRef?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobWithAssetURL
+     */
+    gitBaseSHA?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobWithAssetURL
+     */
+    gitOrg?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobWithAssetURL
+     */
+    gitRepo?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobWithAssetURL
+     */
+    gitRepoLink?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobWithAssetURL
+     */
+    id: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobWithAssetURL
+     */
+    job: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobWithAssetURL
+     */
+    jobSafeName: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobWithAssetURL
+     */
+    pendingTime?: string;
+    /**
+     * 
+     * @type {Array<Pull>}
+     * @memberof JobWithAssetURL
+     */
+    pulls: Array<Pull>;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobWithAssetURL
+     */
+    startTime?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobWithAssetURL
+     */
+    status: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobWithAssetURL
+     */
+    url: string;
+}
+/**
+ * 
+ * @export
  * @interface JobsGetResponseBody
  */
 export interface JobsGetResponseBody {
     /**
      * 
-     * @type {Job}
+     * @type {JobWithAssetURL}
      * @memberof JobsGetResponseBody
      */
-    job: Job;
+    job: JobWithAssetURL;
 }
 /**
  * 

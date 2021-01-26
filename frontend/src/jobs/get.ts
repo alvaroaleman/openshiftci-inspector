@@ -1,4 +1,4 @@
-import {Job, JobsApi} from "../api-client";
+import {JobsApi, JobWithAssetURL} from "../api-client";
 import INotificationService, {NotificationType} from "../notification/service/INotificationService";
 
 export default class JobsGetService {
@@ -8,7 +8,7 @@ export default class JobsGetService {
         private notificationService: INotificationService
     ) {}
 
-    public async getJob(id: string): Promise<Job> {
+    public async getJob(id: string): Promise<JobWithAssetURL> {
         try {
             let response = await this.api.getJob(id)
             return response.data.job
