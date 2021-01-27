@@ -26,6 +26,6 @@ export default function JobStatus(props: IJobStatusProps) {
         case "aborted":
             return <Tooltip title="Aborted" aria-label="aborted"><CancelIcon htmlColor={theme.palette.secondary.main} fontSize={props.fontSize}  /></Tooltip>
         default:
-            return <Tooltip title={{ status }}><HelpIcon htmlColor={theme.palette.secondary.main} fontSize={props.fontSize}  /></Tooltip>
+            return <Tooltip title={ status }><HelpIcon htmlColor={theme.palette.secondary.main} fontSize={props.fontSize}  /></Tooltip>
     }
 }

@@ -12,11 +12,15 @@ var ErrJobNotFound = errors.New("job not found")
 
 type ListJobsParams struct {
 	Job        *string
+	JobLike    *string
 	GitOrg     *string
 	GitRepo    *string
+	RepoLike   *string
 	PullNumber *int
 	Before     *time.Time
 	After      *time.Time
+	Limit      *uint
+	Offset     *uint
 }
 
 // JobsStorage stores a database of all jobs.

@@ -342,10 +342,14 @@ export const JobsApiAxiosParamCreator = function (configuration?: Configuration)
          * 
          * @summary Returns a list of previous jobs for the same build and branch.
          * @param {string} iD ID of the job to fetch.
+         * @param {string} [jobLike] Job name part to search for.
+         * @param {string} [repoLike] Repository name part to search for.
+         * @param {number} [limit] How many items to fetch.
+         * @param {number} [offset] At which item to start
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPreviousJobs: async (iD: string, options: any = {}): Promise<RequestArgs> => {
+        getPreviousJobs: async (iD: string, jobLike?: string, repoLike?: string, limit?: number, offset?: number, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'iD' is not null or undefined
             if (iD === null || iD === undefined) {
                 throw new RequiredError('iD','Required parameter iD was null or undefined when calling getPreviousJobs.');
@@ -362,6 +366,22 @@ export const JobsApiAxiosParamCreator = function (configuration?: Configuration)
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (jobLike !== undefined) {
+                localVarQueryParameter['jobLike'] = jobLike;
+            }
+
+            if (repoLike !== undefined) {
+                localVarQueryParameter['repoLike'] = repoLike;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
 
 
     
@@ -385,10 +405,14 @@ export const JobsApiAxiosParamCreator = function (configuration?: Configuration)
          * 
          * @summary Returns a list of related jobs for the same build and branch.
          * @param {string} iD ID of the job to fetch.
+         * @param {string} [jobLike] Job name part to search for.
+         * @param {string} [repoLike] Repository name part to search for.
+         * @param {number} [limit] How many items to fetch.
+         * @param {number} [offset] At which item to start
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRelatedJobs: async (iD: string, options: any = {}): Promise<RequestArgs> => {
+        getRelatedJobs: async (iD: string, jobLike?: string, repoLike?: string, limit?: number, offset?: number, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'iD' is not null or undefined
             if (iD === null || iD === undefined) {
                 throw new RequiredError('iD','Required parameter iD was null or undefined when calling getRelatedJobs.');
@@ -405,6 +429,22 @@ export const JobsApiAxiosParamCreator = function (configuration?: Configuration)
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (jobLike !== undefined) {
+                localVarQueryParameter['jobLike'] = jobLike;
+            }
+
+            if (repoLike !== undefined) {
+                localVarQueryParameter['repoLike'] = repoLike;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
 
 
     
@@ -427,10 +467,14 @@ export const JobsApiAxiosParamCreator = function (configuration?: Configuration)
         /**
          * 
          * @summary Get a list of jobs currently stored.
+         * @param {string} [jobLike] Job name part to search for.
+         * @param {string} [repoLike] Repository name part to search for.
+         * @param {number} [limit] How many items to fetch.
+         * @param {number} [offset] At which item to start
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listJobs: async (options: any = {}): Promise<RequestArgs> => {
+        listJobs: async (jobLike?: string, repoLike?: string, limit?: number, offset?: number, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/jobs`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -442,6 +486,22 @@ export const JobsApiAxiosParamCreator = function (configuration?: Configuration)
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (jobLike !== undefined) {
+                localVarQueryParameter['jobLike'] = jobLike;
+            }
+
+            if (repoLike !== undefined) {
+                localVarQueryParameter['repoLike'] = repoLike;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
 
 
     
@@ -488,11 +548,15 @@ export const JobsApiFp = function(configuration?: Configuration) {
          * 
          * @summary Returns a list of previous jobs for the same build and branch.
          * @param {string} iD ID of the job to fetch.
+         * @param {string} [jobLike] Job name part to search for.
+         * @param {string} [repoLike] Repository name part to search for.
+         * @param {number} [limit] How many items to fetch.
+         * @param {number} [offset] At which item to start
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getPreviousJobs(iD: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<JobsListResponseBody>> {
-            const localVarAxiosArgs = await JobsApiAxiosParamCreator(configuration).getPreviousJobs(iD, options);
+        async getPreviousJobs(iD: string, jobLike?: string, repoLike?: string, limit?: number, offset?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<JobsListResponseBody>> {
+            const localVarAxiosArgs = await JobsApiAxiosParamCreator(configuration).getPreviousJobs(iD, jobLike, repoLike, limit, offset, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -502,11 +566,15 @@ export const JobsApiFp = function(configuration?: Configuration) {
          * 
          * @summary Returns a list of related jobs for the same build and branch.
          * @param {string} iD ID of the job to fetch.
+         * @param {string} [jobLike] Job name part to search for.
+         * @param {string} [repoLike] Repository name part to search for.
+         * @param {number} [limit] How many items to fetch.
+         * @param {number} [offset] At which item to start
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getRelatedJobs(iD: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<JobsListResponseBody>> {
-            const localVarAxiosArgs = await JobsApiAxiosParamCreator(configuration).getRelatedJobs(iD, options);
+        async getRelatedJobs(iD: string, jobLike?: string, repoLike?: string, limit?: number, offset?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<JobsListResponseBody>> {
+            const localVarAxiosArgs = await JobsApiAxiosParamCreator(configuration).getRelatedJobs(iD, jobLike, repoLike, limit, offset, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -515,11 +583,15 @@ export const JobsApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Get a list of jobs currently stored.
+         * @param {string} [jobLike] Job name part to search for.
+         * @param {string} [repoLike] Repository name part to search for.
+         * @param {number} [limit] How many items to fetch.
+         * @param {number} [offset] At which item to start
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listJobs(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<JobsListResponseBody>> {
-            const localVarAxiosArgs = await JobsApiAxiosParamCreator(configuration).listJobs(options);
+        async listJobs(jobLike?: string, repoLike?: string, limit?: number, offset?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<JobsListResponseBody>> {
+            const localVarAxiosArgs = await JobsApiAxiosParamCreator(configuration).listJobs(jobLike, repoLike, limit, offset, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -548,30 +620,42 @@ export const JobsApiFactory = function (configuration?: Configuration, basePath?
          * 
          * @summary Returns a list of previous jobs for the same build and branch.
          * @param {string} iD ID of the job to fetch.
+         * @param {string} [jobLike] Job name part to search for.
+         * @param {string} [repoLike] Repository name part to search for.
+         * @param {number} [limit] How many items to fetch.
+         * @param {number} [offset] At which item to start
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPreviousJobs(iD: string, options?: any): AxiosPromise<JobsListResponseBody> {
-            return JobsApiFp(configuration).getPreviousJobs(iD, options).then((request) => request(axios, basePath));
+        getPreviousJobs(iD: string, jobLike?: string, repoLike?: string, limit?: number, offset?: number, options?: any): AxiosPromise<JobsListResponseBody> {
+            return JobsApiFp(configuration).getPreviousJobs(iD, jobLike, repoLike, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Returns a list of related jobs for the same build and branch.
          * @param {string} iD ID of the job to fetch.
+         * @param {string} [jobLike] Job name part to search for.
+         * @param {string} [repoLike] Repository name part to search for.
+         * @param {number} [limit] How many items to fetch.
+         * @param {number} [offset] At which item to start
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRelatedJobs(iD: string, options?: any): AxiosPromise<JobsListResponseBody> {
-            return JobsApiFp(configuration).getRelatedJobs(iD, options).then((request) => request(axios, basePath));
+        getRelatedJobs(iD: string, jobLike?: string, repoLike?: string, limit?: number, offset?: number, options?: any): AxiosPromise<JobsListResponseBody> {
+            return JobsApiFp(configuration).getRelatedJobs(iD, jobLike, repoLike, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Get a list of jobs currently stored.
+         * @param {string} [jobLike] Job name part to search for.
+         * @param {string} [repoLike] Repository name part to search for.
+         * @param {number} [limit] How many items to fetch.
+         * @param {number} [offset] At which item to start
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listJobs(options?: any): AxiosPromise<JobsListResponseBody> {
-            return JobsApiFp(configuration).listJobs(options).then((request) => request(axios, basePath));
+        listJobs(jobLike?: string, repoLike?: string, limit?: number, offset?: number, options?: any): AxiosPromise<JobsListResponseBody> {
+            return JobsApiFp(configuration).listJobs(jobLike, repoLike, limit, offset, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -599,35 +683,47 @@ export class JobsApi extends BaseAPI {
      * 
      * @summary Returns a list of previous jobs for the same build and branch.
      * @param {string} iD ID of the job to fetch.
+     * @param {string} [jobLike] Job name part to search for.
+     * @param {string} [repoLike] Repository name part to search for.
+     * @param {number} [limit] How many items to fetch.
+     * @param {number} [offset] At which item to start
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof JobsApi
      */
-    public getPreviousJobs(iD: string, options?: any) {
-        return JobsApiFp(this.configuration).getPreviousJobs(iD, options).then((request) => request(this.axios, this.basePath));
+    public getPreviousJobs(iD: string, jobLike?: string, repoLike?: string, limit?: number, offset?: number, options?: any) {
+        return JobsApiFp(this.configuration).getPreviousJobs(iD, jobLike, repoLike, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @summary Returns a list of related jobs for the same build and branch.
      * @param {string} iD ID of the job to fetch.
+     * @param {string} [jobLike] Job name part to search for.
+     * @param {string} [repoLike] Repository name part to search for.
+     * @param {number} [limit] How many items to fetch.
+     * @param {number} [offset] At which item to start
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof JobsApi
      */
-    public getRelatedJobs(iD: string, options?: any) {
-        return JobsApiFp(this.configuration).getRelatedJobs(iD, options).then((request) => request(this.axios, this.basePath));
+    public getRelatedJobs(iD: string, jobLike?: string, repoLike?: string, limit?: number, offset?: number, options?: any) {
+        return JobsApiFp(this.configuration).getRelatedJobs(iD, jobLike, repoLike, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @summary Get a list of jobs currently stored.
+     * @param {string} [jobLike] Job name part to search for.
+     * @param {string} [repoLike] Repository name part to search for.
+     * @param {number} [limit] How many items to fetch.
+     * @param {number} [offset] At which item to start
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof JobsApi
      */
-    public listJobs(options?: any) {
-        return JobsApiFp(this.configuration).listJobs(options).then((request) => request(this.axios, this.basePath));
+    public listJobs(jobLike?: string, repoLike?: string, limit?: number, offset?: number, options?: any) {
+        return JobsApiFp(this.configuration).listJobs(jobLike, repoLike, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

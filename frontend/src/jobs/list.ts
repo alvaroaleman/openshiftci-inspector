@@ -6,6 +6,8 @@ export default class JobsListService extends AbstractService {
     private loaded: boolean
     private refreshing: boolean
     private jobs: Array<Job> = new Array<Job>()
+    private jobFilter: string = ""
+    private repoFilter: string = ""
 
     constructor(
         private api: JobsApi,
@@ -29,11 +31,20 @@ export default class JobsListService extends AbstractService {
         return this.refreshing
     }
 
+    public setFilters(jobFilter: string, repoFilter: string): void {
+        this.jobFilter = jobFilter
+        this.repoFilter = repoFilter
+        this.refresh()
+    }
+
+
     public async refresh() {
         this.refreshing = true
         this.notify()
         try {
-            let response = await this.api.listJobs()
+            let response = await this.api.listJobs(
+                this.jobFilter, this.repoFilter
+            )
             if (response.data.jobs) {
                 this.jobs = response.data.jobs
             }

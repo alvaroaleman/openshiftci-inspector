@@ -264,18 +264,19 @@ func (m *mysqlJobsStorage) ListJobs(params storage.ListJobsParams) (jobList []jo
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	where := ""
+	limit := ""
 	var whereClauses []string
 	var whereParams []interface{}
 	if params.Job != nil {
-		whereClauses = append(whereClauses, "job = ?")
+		whereClauses = append(whereClauses, "jobs.job = ?")
 		whereParams = append(whereParams, *params.Job)
 	}
 	if params.GitRepo != nil {
-		whereClauses = append(whereClauses, "git_repo = ?")
+		whereClauses = append(whereClauses, "jobs.git_repo = ?")
 		whereParams = append(whereParams, *params.GitRepo)
 	}
 	if params.GitOrg != nil {
-		whereClauses = append(whereClauses, "git_org = ?")
+		whereClauses = append(whereClauses, "jobs.git_org = ?")
 		whereParams = append(whereParams, *params.GitOrg)
 	}
 	if params.PullNumber != nil {
@@ -284,16 +285,32 @@ func (m *mysqlJobsStorage) ListJobs(params storage.ListJobsParams) (jobList []jo
 		where = " LEFT JOIN job_pulls ON job_pulls.job_id=jobs.id"
 	}
 	if params.Before != nil {
-		whereClauses = append(whereClauses, "start_time < ?")
+		whereClauses = append(whereClauses, "jobs.start_time < ?")
 		whereParams = append(whereParams, *params.Before)
 	}
 	if params.After != nil {
-		whereClauses = append(whereClauses, "start_time > ?")
+		whereClauses = append(whereClauses, "jobs.start_time > ?")
 		whereParams = append(whereParams, *params.After)
+	}
+	if params.JobLike != nil {
+		whereClauses = append(whereClauses, "jobs.job LIKE ?")
+		whereParams = append(whereParams, "%"+*params.JobLike+"%")
+	}
+	if params.RepoLike != nil {
+		whereClauses = append(whereClauses, "CONCAT(jobs.git_org, \"/\", jobs.git_org) LIKE ?")
+		whereParams = append(whereParams, "%"+*params.RepoLike+"%")
 	}
 
 	if len(whereClauses) > 0 {
 		where += " WHERE " + strings.Join(whereClauses, " AND ")
+	}
+
+	if params.Limit != nil {
+		if params.Offset != nil && *params.Offset > 0 {
+			limit = fmt.Sprintf(" LIMIT %d OFFSET %d", *params.Limit, *params.Offset)
+		} else {
+			limit = fmt.Sprintf(" LIMIT %d", *params.Limit)
+		}
 	}
 
 	var result *sql.Rows
@@ -315,7 +332,7 @@ SELECT
     jobs.git_base_ref,
     jobs.git_base_sha,
     jobs.git_base_link
-FROM jobs`+where+` ORDER BY jobs.start_time DESC`,
+FROM jobs`+where+` ORDER BY jobs.start_time DESC`+limit,
 		whereParams...,
 	)
 	if err != nil {

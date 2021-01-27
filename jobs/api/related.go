@@ -45,7 +45,7 @@ func (j *jobsGetRelatedAPI) GetRoutes() []api.Route {
 // default: JobsListResponse
 //
 func (j *jobsGetRelatedAPI) Handle(apiRequest api.Request, response api.Response) error {
-	request := JobsIDRequest{}
+	request := JobsIDLimitRequest{}
 	if err := apiRequest.Decode(&request); err != nil {
 		return err
 	}
@@ -59,18 +59,43 @@ func (j *jobsGetRelatedAPI) Handle(apiRequest api.Request, response api.Response
 		pullNumber = &job.Pulls[0].Number
 	}
 
-	jobList, err := j.storage.ListJobs(storage.ListJobsParams{
-		GitOrg:     &job.GitOrg,
-		GitRepo:    &job.GitRepo,
-		PullNumber: pullNumber,
-	})
+	var jobLike *string
+	if request.JobLike != "" {
+		jobLike = &request.JobLike
+	}
+	var repoLike *string
+	if request.RepoLike != "" {
+		repoLike = &request.RepoLike
+	}
+	limit := uint(200)
+	if request.Limit > 0 {
+		limit = request.Limit
+	}
+	offset := uint(0)
+	if request.Offset > 0 {
+		offset = request.Offset
+	}
+
+	jobList, err := j.storage.ListJobs(
+		storage.ListJobsParams{
+			GitOrg:     &job.GitOrg,
+			GitRepo:    &job.GitRepo,
+			PullNumber: pullNumber,
+			Limit:      &limit,
+			Offset:     &offset,
+			JobLike:    jobLike,
+			RepoLike:   repoLike,
+		},
+	)
 	if err != nil {
 		return err
 	}
 	if jobList == nil {
 		jobList = []jobs.Job{}
 	}
-	return response.Encode(JobsListResponseBody{
-		Jobs: jobList,
-	})
+	return response.Encode(
+		JobsListResponseBody{
+			Jobs: jobList,
+		},
+	)
 }

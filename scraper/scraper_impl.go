@@ -29,7 +29,7 @@ type scraperImpl struct {
 func (p *scraperImpl) Run() {
 loop:
 	for {
-		p.logger.Printf("Scraping prow...")
+		p.logger.Printf("Scraping Prow...")
 		jobsList, err := p.scraper.Scrape()
 		if err != nil {
 			p.logger.Printf("Failed to scrape Prow (%v)", err)
@@ -56,6 +56,13 @@ loop:
 				default:
 				}
 			}
+		}
+
+		select {
+		case <-p.runContext.Done():
+			break loop
+		default:
+			p.logger.Printf("Sleeping for 10 minutes...")
 		}
 
 		select {

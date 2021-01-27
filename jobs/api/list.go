@@ -41,8 +41,35 @@ func (j *jobsListAPI) GetRoutes() []api.Route {
 // Responses:
 // default: JobsListResponse
 //
-func (j *jobsListAPI) Handle(_ api.Request, response api.Response) error {
-	jobList, err := j.storage.ListJobs(storage.ListJobsParams{})
+func (j *jobsListAPI) Handle(req api.Request, response api.Response) error {
+	listRequest := JobsListRequest{}
+	if err := req.Decode(&listRequest); err != nil {
+		return err
+	}
+
+	var jobLike *string
+	if listRequest.JobLike != "" {
+		jobLike = &listRequest.JobLike
+	}
+	var repoLike *string
+	if listRequest.RepoLike != "" {
+		repoLike = &listRequest.RepoLike
+	}
+	limit := uint(200)
+	if listRequest.Limit > 0 {
+		limit = listRequest.Limit
+	}
+	offset := uint(0)
+	if listRequest.Offset > 0 {
+		offset = listRequest.Offset
+	}
+
+	jobList, err := j.storage.ListJobs(storage.ListJobsParams{
+		Limit:    &limit,
+		Offset:   &offset,
+		RepoLike: repoLike,
+		JobLike:  jobLike,
+	})
 	if err != nil {
 		return err
 	}

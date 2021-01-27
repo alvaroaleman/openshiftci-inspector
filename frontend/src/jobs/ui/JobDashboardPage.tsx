@@ -18,6 +18,7 @@ import Link from "../../common/Link"
 interface IDashboardState {
     jobFilter: string,
     repoFilter: string,
+    typingTimer?: number,
     isLoaded: boolean,
     isRefreshing: boolean,
     jobs: Array<Job>
@@ -58,15 +59,31 @@ export default class JobDashboardPage extends React.Component<IDashboardProps, I
         })
     }
 
+    search = () => {
+        if (this.state.typingTimer) {
+            window.clearTimeout(this.state.typingTimer)
+        }
+        this.setState({typingTimer:undefined})
+        this.props.jobsListService.setFilters(this.state.jobFilter, this.state.repoFilter)
+    }
+
     changeJobFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (this.state.typingTimer) {
+            window.clearTimeout(this.state.typingTimer)
+        }
         this.setState({
             jobFilter: e.target.value,
+            typingTimer: window.setTimeout(this.search, 300)
         })
     }
 
     changeRepoFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (this.state.typingTimer) {
+            window.clearTimeout(this.state.typingTimer)
+        }
         this.setState({
             repoFilter: e.target.value,
+            typingTimer: window.setTimeout(this.search, 300)
         })
     }
 
@@ -90,19 +107,7 @@ export default class JobDashboardPage extends React.Component<IDashboardProps, I
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {this.state.jobs.filter(job => {
-                            if (this.state.jobFilter !== "" && !job.job.includes(this.state.jobFilter)) {
-                                return false
-                            }
-                            // noinspection RedundantIfStatementJS
-                            if (job.gitOrg !== null &&
-                                job.gitRepo !== null &&
-                                this.state.repoFilter !== "" &&
-                                !(job.gitOrg + "/" + job.gitRepo).includes(this.state.repoFilter)) {
-                                return false
-                            }
-                            return true
-                        }).map(job => {
+                        {this.state.jobs.map(job => {
                                 return <TableRow key={job.id}>
                                     <TableCell style={{
                                         display: 'flex',

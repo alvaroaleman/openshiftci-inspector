@@ -45,7 +45,7 @@ func (j *jobsGetPreviousAPI) GetRoutes() []api.Route {
 // default: JobsListResponse
 //
 func (j *jobsGetPreviousAPI) Handle(apiRequest api.Request, response api.Response) error {
-	request := JobsIDRequest{}
+	request := JobsIDLimitRequest{}
 	if err := apiRequest.Decode(&request); err != nil {
 		return err
 	}
@@ -54,11 +54,31 @@ func (j *jobsGetPreviousAPI) Handle(apiRequest api.Request, response api.Respons
 		return err
 	}
 
+	var jobLike *string
+	if request.JobLike != "" {
+		jobLike = &request.JobLike
+	}
+	var repoLike *string
+	if request.RepoLike != "" {
+		repoLike = &request.RepoLike
+	}
+	limit := uint(200)
+	if request.Limit > 0 {
+		limit = request.Limit
+	}
+	offset := uint(0)
+	if request.Offset > 0 {
+		offset = request.Offset
+	}
 	jobList, err := j.storage.ListJobs(storage.ListJobsParams{
-		Job:     &job.Job,
-		GitOrg:  &job.GitOrg,
-		GitRepo: &job.GitRepo,
-		Before:  job.StartTime,
+		Job:      &job.Job,
+		GitOrg:   &job.GitOrg,
+		GitRepo:  &job.GitRepo,
+		Before:   job.StartTime,
+		Limit:    &limit,
+		Offset:   &offset,
+		JobLike:  jobLike,
+		RepoLike: repoLike,
 	})
 	if err != nil {
 		return err

@@ -37,7 +37,7 @@ func (p *queryStringDecoder) decodeStruct(request *http.Request, t reflect.Type,
 	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
 		fieldV := v.Field(i)
-		if routingName, ok := f.Tag.Lookup("path"); ok {
+		if routingName, ok := f.Tag.Lookup("query"); ok {
 			if val := request.URL.Query().Get(routingName); val != "" {
 				if !fieldV.CanSet() {
 					return fmt.Errorf("cannot set field %s", f.Name)
