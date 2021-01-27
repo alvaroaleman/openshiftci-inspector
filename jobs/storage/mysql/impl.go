@@ -29,7 +29,10 @@ func (m *mysqlJobsStorage) UpdateAssetURL(job jobs.Job, assetURL string) error {
 }
 
 func (m *mysqlJobsStorage) GetAssetURLForJob(job jobs.Job) (assetURL string, err error) {
-	result, err := m.db.Query(
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	result, err := m.db.QueryContext(
+		ctx,
 		// language=MySQL
 		`SELECT artifacts_url FROM jobs WHERE id=?`,
 		job.ID,
@@ -125,7 +128,10 @@ INSERT INTO job_pulls (
 }
 
 func (m *mysqlJobsStorage) upsertJob(job jobs.Job) (err error) {
-	_, err = m.db.Exec(
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	_, err = m.db.ExecContext(
+		ctx,
 		// language=MySQL
 		`
 INSERT INTO jobs (
@@ -177,8 +183,11 @@ INSERT INTO jobs (
 }
 
 func (m *mysqlJobsStorage) GetJob(id string) (job jobs.Job, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	var result *sql.Rows
-	result, err = m.db.Query(
+	result, err = m.db.QueryContext(
+		ctx,
 		// language=MySQL
 		`
 SELECT
@@ -204,6 +213,9 @@ LIMIT 1`,
 	if err != nil {
 		return jobs.Job{}, err
 	}
+	defer func() {
+		_ = result.Close()
+	}()
 	if !result.Next() {
 		return jobs.Job{}, storage.ErrJobNotFound
 	}
@@ -249,6 +261,8 @@ LIMIT 1`,
 }
 
 func (m *mysqlJobsStorage) ListJobs(params storage.ListJobsParams) (jobList []jobs.Job, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	where := ""
 	var whereClauses []string
 	var whereParams []interface{}
@@ -283,7 +297,8 @@ func (m *mysqlJobsStorage) ListJobs(params storage.ListJobsParams) (jobList []jo
 	}
 
 	var result *sql.Rows
-	result, err = m.db.Query(
+	result, err = m.db.QueryContext(
+		ctx,
 		`
 SELECT
 	jobs.id,
@@ -358,8 +373,11 @@ FROM jobs`+where+` ORDER BY jobs.start_time DESC`,
 }
 
 func (m *mysqlJobsStorage) getJobPulls(jobID string) ([]jobs.Pull, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	// TODO work around N+1 queries
-	pullsResult, err := m.db.Query(
+	pullsResult, err := m.db.QueryContext(
+		ctx,
 		// language=MySQL
 		`
 SELECT

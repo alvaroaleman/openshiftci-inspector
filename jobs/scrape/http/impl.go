@@ -1,74 +1,48 @@
 package http
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/janoszen/openshiftci-inspector/jobs"
 )
 
 type httpJobsScraper struct {
-	httpClient           *http.Client
-	baseURL              string
-	runContext           context.Context
-	runContextCancelFunc func()
-	logger               *log.Logger
+	httpClient *http.Client
+	baseURL    string
+	logger     *log.Logger
 }
 
-func (h *httpJobsScraper) Scrape() <-chan jobs.Job {
-	jobChannel := make(chan jobs.Job)
-	go func() {
-		for {
-			h.doScrapeRun(jobChannel)
-			select {
-			case <-time.After(10 * time.Minute):
-			case <-h.runContext.Done():
-				return
-			}
-		}
-	}()
-	return jobChannel
-}
-
-func (h *httpJobsScraper) Shutdown(shutdownContext context.Context) {
-	h.runContextCancelFunc()
-}
-
-func (h *httpJobsScraper) doScrapeRun(jobChannels chan jobs.Job) {
-	h.logger.Println("Scraping Prow for jobs...")
+func (h *httpJobsScraper) Scrape() ([]jobs.Job, error) {
 	url := h.baseURL + "/prowjobs.js?var=allBuilds"
 	data, err := h.httpClient.Get(url)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	b, err := ioutil.ReadAll(data.Body)
 	if err != nil {
-		//TODO log
-		return
+		return nil, err
 	}
 	rawJSON := strings.Replace(string(b[:len(b)-1]), "var allBuilds = ", "", 1)
 
 	jobsRaw := &map[string]interface{}{}
 	if err := json.Unmarshal([]byte(rawJSON), jobsRaw); err != nil {
-		//TODO log
-		return
+		return nil, err
 	}
 
 	list := jobList{}
 	if err := json.Unmarshal([]byte(rawJSON), &list); err != nil {
-		//TODO log
-		return
+		return nil, err
 	}
 
-	h.logger.Println("Downloaded " + fmt.Sprintf("%d", len(list.Items)) + "jobs.")
+	i := 0
+	var jobList []jobs.Job
 	for _, rawJob := range list.Items {
+		i++
 		jobNameSafe := ""
 		if len(rawJob.Spec.PodSpec.Containers) > 0 {
 			for _, env := range rawJob.Spec.PodSpec.Containers[0].Env {
@@ -104,13 +78,7 @@ func (h *httpJobsScraper) doScrapeRun(jobChannels chan jobs.Job) {
 				AuthorLink: p.AuthorLink,
 			})
 		}
-		select {
-		case <-h.runContext.Done():
-			h.logger.Println("Exiting scrape jobs.")
-			return
-		case jobChannels <- job:
-			h.logger.Println("Sent job " + job.ID + " for processing...")
-		}
+		jobList = append(jobList, job)
 	}
-	h.logger.Println("Scrape run complete.")
+	return jobList, nil
 }

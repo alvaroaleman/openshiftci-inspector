@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"log"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -15,7 +16,10 @@ type mysqlAssetIndex struct {
 }
 
 func (m *mysqlAssetIndex) AddAsset(jobID string, name string) error {
-	res, err := m.db.Query(
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	res, err := m.db.QueryContext(
+		ctx,
 		`INSERT INTO job_assets (job_id, asset_name) VALUES (?, ?)`,
 		jobID,
 		name,
@@ -30,7 +34,10 @@ func (m *mysqlAssetIndex) AddAsset(jobID string, name string) error {
 }
 
 func (m *mysqlAssetIndex) HasAsset(jobID string, name string) (bool, error) {
-	res, err := m.db.Query(
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	res, err := m.db.QueryContext(
+		ctx,
 		`SELECT COUNT(*) cnt FROM job_assets WHERE job_id=? AND asset_name=?`,
 		jobID,
 		name,
@@ -52,7 +59,10 @@ func (m *mysqlAssetIndex) HasAsset(jobID string, name string) (bool, error) {
 }
 
 func (m *mysqlAssetIndex) ListAssets(jobID string) ([]string, error) {
-	res, err := m.db.Query(
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	res, err := m.db.QueryContext(
+		ctx,
 		`SELECT asset_name FROM job_assets WHERE job_id=?`,
 		jobID,
 	)

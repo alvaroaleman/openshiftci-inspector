@@ -1,27 +1,30 @@
-package pipeline
+package scraper
 
 import (
 	"context"
+	"log"
 
 	"github.com/janoszen/openshiftci-inspector/asset/downloader"
 	"github.com/janoszen/openshiftci-inspector/asset/index"
 	"github.com/janoszen/openshiftci-inspector/jobs/asseturl"
-	"github.com/janoszen/openshiftci-inspector/jobs/indexer"
 	"github.com/janoszen/openshiftci-inspector/jobs/scrape"
+	"github.com/janoszen/openshiftci-inspector/jobs/storage"
 )
 
 func New(
+	logger *log.Logger,
 	scraper scrape.JobsScraper,
-	jobIndexer indexer.JobIndexer,
+	jobsStorage storage.JobsStorage,
 	assetURLFetcher asseturl.JobAssetURLFetcher,
 	assetIndex index.AssetIndexer,
 	assetDownloader downloader.AssetDownloader,
-) Pipeline {
+) Scraper {
 	runContext, cancel := context.WithCancel(context.Background())
 
-	return &pipelineImpl{
+	return &scraperImpl{
+		logger:          logger,
 		scraper:         scraper,
-		jobIndexer:      jobIndexer,
+		jobsStorage:     jobsStorage,
 		assetURLFetcher: assetURLFetcher,
 		assetIndex:      assetIndex,
 		assetDownloader: assetDownloader,

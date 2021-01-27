@@ -16,16 +16,15 @@ import (
 	mysqlCommon "github.com/janoszen/openshiftci-inspector/common/mysql"
 	"github.com/janoszen/openshiftci-inspector/jobs/asseturl/caching"
 	assetURLHTTP "github.com/janoszen/openshiftci-inspector/jobs/asseturl/http"
-	"github.com/janoszen/openshiftci-inspector/jobs/indexer"
 	scrapeHTTP "github.com/janoszen/openshiftci-inspector/jobs/scrape/http"
 	"github.com/janoszen/openshiftci-inspector/jobs/storage/mysql"
-	"github.com/janoszen/openshiftci-inspector/pipeline"
+	"github.com/janoszen/openshiftci-inspector/scraper"
 )
 
 func main() {
 	logger := log.New(os.Stdout, "", 0)
 
-	scraper, err := scrapeHTTP.NewHTTPScraper(
+	httpScraper, err := scrapeHTTP.NewHTTPScraper(
 		commonHTTP.Config{
 			BaseURL: "https://prow.ci.openshift.org/",
 			CACert:  os.Getenv("CA_CERT"),
@@ -48,7 +47,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	jobIndexer := indexer.NewJobsIndexer(jobStorage, logger)
 
 	httpAssetURLFetcher, err := assetURLHTTP.NewHTTPAssetURLFetcher(
 		commonHTTP.Config{
@@ -70,8 +68,10 @@ func main() {
 		panic(err)
 	}
 
-	assets := []string{
-		"artifacts/e2e-ovirt/metrics/prometheus.tar",
+	assets := map[string][]string{
+		"e2e-ovirt": {
+			"artifacts/e2e-ovirt/metrics/prometheus.tar",
+		},
 	}
 
 	assetIndex := index.New(assetIndexStorage, logger, assets)
@@ -88,6 +88,9 @@ func main() {
 		},
 		logger,
 	)
+	if err != nil {
+		panic(err)
+	}
 
 	assetDownloader, err := httpDownloader.New(
 		commonHTTP.Config{
@@ -102,9 +105,10 @@ func main() {
 		panic(err)
 	}
 
-	program := pipeline.New(
-		scraper,
-		jobIndexer,
+	program := scraper.New(
+		logger,
+		httpScraper,
+		jobStorage,
 		assetURLFetcher,
 		assetIndex,
 		assetDownloader,

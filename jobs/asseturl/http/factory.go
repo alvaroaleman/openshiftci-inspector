@@ -18,7 +18,5 @@ func NewHTTPAssetURLFetcher(config http.Config) (asseturl.JobAssetURLFetcher, er
 	return &httpAssetURLFetcher{
 		baseURL:    config.BaseURL,
 		httpClient: httpClient,
-		exit:       make(chan struct{}),
-		done:       make(chan struct{}),
 	}, nil
 }

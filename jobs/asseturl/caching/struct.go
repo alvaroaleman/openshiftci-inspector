@@ -10,7 +10,5 @@ import (
 type cachingJobsAssetURLFetcher struct {
 	storage storage.JobsAssetURLStorage
 	backend asseturl.JobAssetURLFetcher
-	exit    chan struct{}
-	done    chan struct{}
 	logger  *log.Logger
 }

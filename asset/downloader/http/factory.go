@@ -31,8 +31,6 @@ func New(
 		client:  client,
 		storage: storage,
 		index:   index,
-		exit:    make(chan struct{}),
-		done:    make(chan struct{}),
 		logger:  logger,
 	}, nil
 }

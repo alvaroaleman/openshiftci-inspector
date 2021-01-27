@@ -15,8 +15,6 @@ func New(
 	return &cachingJobsAssetURLFetcher{
 		storage: storage,
 		backend: backend,
-		exit:    make(chan struct{}),
-		done:    make(chan struct{}),
 		logger:  logger,
 	}
 }

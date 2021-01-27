@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"log"
 
 	http2 "github.com/janoszen/openshiftci-inspector/common/http"
@@ -19,13 +18,9 @@ func NewHTTPScraper(config http2.Config, logger *log.Logger) (scrape.JobsScraper
 		return nil, err
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-
 	return &httpJobsScraper{
-		httpClient:           httpClient,
-		baseURL:              config.BaseURL,
-		runContext:           ctx,
-		runContextCancelFunc: cancel,
-		logger:               logger,
+		httpClient: httpClient,
+		baseURL:    config.BaseURL,
+		logger:     logger,
 	}, nil
 }
