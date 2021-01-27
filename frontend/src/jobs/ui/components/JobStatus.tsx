@@ -1,4 +1,3 @@
-import {Tooltip} from "@material-ui/core";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import ErrorIcon from "@material-ui/icons/Error";
 import WatchLaterIcon from "@material-ui/icons/WatchLater";
@@ -16,16 +15,14 @@ export default function JobStatus(props: IJobStatusProps) {
     const status = props.status
     switch (status) {
         case "success":
-            return <Tooltip title="Success" aria-label="success">
-                <CheckCircleIcon htmlColor={theme.palette.success.main} fontSize={props.fontSize} />
-            </Tooltip>
+            return <CheckCircleIcon htmlColor={theme.palette.success.main} fontSize={props.fontSize} />
         case "failure":
-            return <Tooltip title="Failure" aria-label="failure"><ErrorIcon htmlColor={theme.palette.error.main} fontSize={props.fontSize} /></Tooltip>
+            return <ErrorIcon htmlColor={theme.palette.error.main} fontSize={props.fontSize} />
         case "pending":
-            return <Tooltip title="Pending" aria-label="pending"><WatchLaterIcon htmlColor={theme.palette.warning.main} fontSize={props.fontSize} /></Tooltip>
+            return <WatchLaterIcon htmlColor={theme.palette.warning.main} fontSize={props.fontSize} />
         case "aborted":
-            return <Tooltip title="Aborted" aria-label="aborted"><CancelIcon htmlColor={theme.palette.secondary.main} fontSize={props.fontSize}  /></Tooltip>
+            return <CancelIcon htmlColor={theme.palette.secondary.main} fontSize={props.fontSize}  />
         default:
-            return <Tooltip title={ status }><HelpIcon htmlColor={theme.palette.secondary.main} fontSize={props.fontSize}  /></Tooltip>
+            return <HelpIcon htmlColor={theme.palette.secondary.main} fontSize={props.fontSize}  />
     }
 }
