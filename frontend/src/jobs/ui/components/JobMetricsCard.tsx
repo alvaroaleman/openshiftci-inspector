@@ -5,6 +5,7 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import JobsMetricsService from "../../metrics";
 import {QueryPoint, QuerySample, QuerySeries} from "../../../api-client";
+import moment from "moment-timezone";
 
 interface IJobMetricsCardProps {
     id: string
@@ -16,6 +17,8 @@ interface IJobMetricsCardState {
     loading: boolean
     loaded: boolean
     line: Serie[]
+    timeRangeLowest: number,
+    timeRangeHighest: number,
 }
 
 export default class JobMetricsCard extends React.Component<IJobMetricsCardProps, IJobMetricsCardState> {
@@ -26,6 +29,8 @@ export default class JobMetricsCard extends React.Component<IJobMetricsCardProps
             loading: false,
             loaded: false,
             line: [],
+            timeRangeLowest: 0,
+            timeRangeHighest: 0
         }
     }
     onQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,6 +61,8 @@ export default class JobMetricsCard extends React.Component<IJobMetricsCardProps
     }
 
     updateMatrix = (matrix: Array<QuerySeries>) => {
+        let lowestTimestamp = 0
+        let highestTimestamp = 0
         const series = matrix.map(function (value):Serie {
             return {
                 id: value.labels.map(function (label) {
@@ -64,8 +71,15 @@ export default class JobMetricsCard extends React.Component<IJobMetricsCardProps
                     return prev + "," + current
                 }),
                 data: value.points.map(function (v, index) {
+                    if (lowestTimestamp === 0 || v.timestamp < lowestTimestamp) {
+                        lowestTimestamp = v.timestamp
+                    }
+                    if (v.timestamp > highestTimestamp) {
+                        highestTimestamp = v.timestamp
+                    }
+                    let d = moment.unix(Math.floor(v.timestamp/1000)).tz("UTC")
                     return {
-                        x: new Date(v.timestamp).toLocaleString(),
+                        x: d.format("HH:mm:ss"),
                         y: v.value
                     }
                 })
@@ -75,6 +89,8 @@ export default class JobMetricsCard extends React.Component<IJobMetricsCardProps
             loaded: true,
             loading: false,
             line: series,
+            timeRangeLowest: lowestTimestamp,
+            timeRangeHighest: highestTimestamp,
         })
     }
 
@@ -90,6 +106,17 @@ export default class JobMetricsCard extends React.Component<IJobMetricsCardProps
             loaded: true,
             loading: false,
         })
+    }
+
+    getTickValues = () => {
+        const diff = (this.state.timeRangeHighest - this.state.timeRangeLowest)
+        let result = []
+        if (diff !== 0) {
+            for (let i = this.state.timeRangeLowest; i < this.state.timeRangeHighest; i = i + diff / 10) {
+                result.push(new Date(i).getUTCDate())
+            }
+        }
+        return result
     }
 
     render = () => {
@@ -122,8 +149,14 @@ export default class JobMetricsCard extends React.Component<IJobMetricsCardProps
                         {this.state.loading?<LinearProgress />:
                             this.state.loaded?
                             <ResponsiveLine
-                                xScale={{ type: 'point' }}
-                                yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: true, reverse: false }}
+                                xScale={{
+                                    type: 'time',
+                                    format: "%H:%M:%S",
+                                    precision: "second",
+                                }}
+                                xFormat="time:%H:%M:%S"
+                                yScale={{ type: 'linear', min: 'auto', max: 'auto' }}
+                                margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
                                 data={this.state.line}
                                 pointSize={1}
                                 pointColor={{ from: 'color', modifiers: [] }}
@@ -135,7 +168,9 @@ export default class JobMetricsCard extends React.Component<IJobMetricsCardProps
                                     orient: 'bottom',
                                     tickSize: 5,
                                     tickPadding: 5,
-                                    tickRotation: 0,
+                                    tickRotation: -60,
+                                    tickValues: "every 1 minutes",
+                                    format: '%H:%M:%S',
                                     legend: 'Time',
                                     legendOffset: 36,
                                     legendPosition: 'middle'
