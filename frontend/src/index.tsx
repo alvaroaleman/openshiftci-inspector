@@ -20,6 +20,7 @@ import {
 import {RouteComponentProps} from "react-router";
 import JobsGetPreviousService from "./jobs/previous";
 import JobsGetRelatedService from "./jobs/related";
+import JobsMetricsService from "./jobs/metrics";
 
 const notificationServiceFactory = new NotificationServiceFactory();
 const toastHandlerFactory = new ToastHandlerFactory(
@@ -38,6 +39,7 @@ const jobsListService = new JobsListService(jobsAPI, notificationServiceFactory.
 const jobsGetService = new JobsGetService(jobsAPI, notificationServiceFactory.create())
 const jobsGetPreviousService = new JobsGetPreviousService(jobsAPI, notificationServiceFactory.create())
 const jobsGetRelatedService = new JobsGetRelatedService(jobsAPI, notificationServiceFactory.create())
+const jobMetricsService = new JobsMetricsService(jobsAPI, notificationServiceFactory.create())
 
 ReactDOM.render(
     <ThemeProvider theme={theme}>
@@ -64,5 +66,6 @@ function jobDetailsRoute(props: RouteComponentProps<any>) {
         id={props.match.params.id}
         jobsGetPreviousService={jobsGetPreviousService}
         jobsGetRelatedService={jobsGetRelatedService}
+        metricsService={jobMetricsService}
     />
 }

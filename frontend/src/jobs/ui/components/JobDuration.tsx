@@ -2,13 +2,11 @@ import {Tooltip} from "@material-ui/core";
 import * as React from "react";
 
 export interface IJobTimeProps{
-    time?: string
+    startTime?: string
+    completionTime?: string
 }
 
-function timeSince(currentDate: number, lookupTime: number) {
-
-    const seconds = Math.floor((currentDate - lookupTime) / 1000);
-
+function timeDuration(seconds: number) {
     const years = Math.floor(seconds / 31536000);
     if (years >= 1) {
         return years + " years";
@@ -32,10 +30,15 @@ function timeSince(currentDate: number, lookupTime: number) {
     return Math.floor(seconds) + " seconds";
 }
 
-export default function JobTime(props: IJobTimeProps) {
-    if (!props.time || props.time === "") {
+export default function JobDuration(props: IJobTimeProps) {
+    if (!props.startTime || props.startTime === "") {
         return <span>&mdash;</span>
     }
-    const parsedTime = Date.parse(props.time)
-    return <Tooltip title={props.time}><span><span style={{whiteSpace:"nowrap"}}>{timeSince(new Date().getTime(), parsedTime)}</span> ago</span></Tooltip>
+    if (!props.completionTime || props.completionTime === "") {
+        return <span>&mdash;</span>
+    }
+    const parsedStartTime = Date.parse(props.startTime)
+    const parsedCompletionTime = Date.parse(props.completionTime)
+    const seconds = Math.floor((parsedCompletionTime - parsedStartTime) / 1000);
+    return <Tooltip title={seconds + " seconds"}><span><span style={{whiteSpace:"nowrap"}}>{timeDuration(seconds)}</span></span></Tooltip>
 }

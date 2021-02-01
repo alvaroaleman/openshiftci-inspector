@@ -7,5 +7,5 @@ type JobsMetricsRequest struct {
 	JobsIDRequest
 
 	// In: query
-	Query string `query:"query"`
+	Query string `query:"query" json:"query"`
 }

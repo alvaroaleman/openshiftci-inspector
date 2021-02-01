@@ -55,7 +55,7 @@ func (j *jobMetricsAPI) GetRoutes() []api.Route {
 // Schemes: http
 //
 // Responses:
-// default: JobsMetricsResponse
+// default: JobsMetricsResponseBody
 func (j *jobMetricsAPI) Handle(request api.Request, response api.Response) error {
 	req := JobsMetricsRequest{}
 	if err := request.Decode(&req); err != nil {
@@ -85,8 +85,8 @@ func (j *jobMetricsAPI) Handle(request api.Request, response api.Response) error
 	if err != nil {
 		return err
 	}
-	result := JobsMetricsResponse{
-		Result: queryResult,
+	result := JobsMetricsResponseBody{
+		queryResult,
 	}
 
 	if err := response.Encode(result); err != nil {

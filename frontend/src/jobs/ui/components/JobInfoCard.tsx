@@ -15,6 +15,7 @@ import {
 import LaunchIcon from '@material-ui/icons/Launch';
 import JobStatus from "./JobStatus";
 import JobTime from "./JobTime";
+import JobDuration from "./JobDuration";
 
 interface IJobInfoCardState {
     isLoaded: boolean,
@@ -82,24 +83,6 @@ export default class JobInfoCard extends React.Component<IJobInfoCardProps, IJob
                                         <TableCell>{job.status}</TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell><strong>Start time:</strong></TableCell>
-                                        <TableCell><JobTime time={job.startTime} /></TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell><strong>Pending time:</strong></TableCell>
-                                        <TableCell><JobTime time={job.pendingTime} /></TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell><strong>Completion time:</strong></TableCell>
-                                        <TableCell><JobTime time={job.completionTime} /></TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <Table size="small">
-                                <TableBody>
-                                    <TableRow>
                                         <TableCell><strong>Repository:</strong></TableCell>
                                         <TableCell>{job.gitOrg != null && job.gitRepo != null?<a href={job.gitRepoLink} target="_blank" rel={"noreferrer noopener"}>{job.gitOrg}/{job.gitRepo} <LaunchIcon style={{fontSize:"1em"}} /></a>:null}</TableCell>
                                     </TableRow>
@@ -111,6 +94,29 @@ export default class JobInfoCard extends React.Component<IJobInfoCardProps, IJob
                                         <TableCell><strong>Pulls:</strong></TableCell>
                                         <TableCell>{this.getPulls()}</TableCell>
                                     </TableRow>
+                                </TableBody>
+                            </Table>
+                        </Grid>
+                        <Grid item xs={6}>
+                            <Table size="small">
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell><strong>Started:</strong></TableCell>
+                                        <TableCell><JobTime time={job.startTime} /></TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell><strong>Pending:</strong></TableCell>
+                                        <TableCell><JobTime time={job.pendingTime} /></TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell><strong>Completed:</strong></TableCell>
+                                        <TableCell><JobTime time={job.completionTime} /></TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell><strong>Total time:</strong></TableCell>
+                                        <TableCell><JobDuration startTime={job.pendingTime} completionTime={job.completionTime} /></TableCell>
+                                    </TableRow>
+
                                 </TableBody>
                             </Table>
                         </Grid>

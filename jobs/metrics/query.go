@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path"
 	"time"
@@ -51,7 +52,10 @@ func (q *queryImpl) Query(
 
 	tarDir, err := q.extractTar(tarContents, jobID, name)
 	defer func() {
-		_ = os.RemoveAll(tarDir)
+		if err = os.RemoveAll(tarDir); err != nil {
+			//TODO replace with injected logger
+			log.Println("failed to delete tar directory (%w)", err)
+		}
 	}()
 	if err != nil {
 		return QueryResponse{}, err
@@ -163,9 +167,12 @@ func (q *queryImpl) runQuery(ctx context.Context, dir string, query string, star
 	if err != nil {
 		return QueryResponse{}, err
 	}
+	defer func() {
+		_ = promDB.Close()
+	}()
 	engine := promql.NewEngine(promql.EngineOpts{
 		Logger:     nil,
-		Reg:        nil,
+		Reg:        registry,
 		Timeout:    time.Minute,
 		MaxSamples: 50000000,
 	})

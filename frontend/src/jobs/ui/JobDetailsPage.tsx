@@ -6,6 +6,8 @@ import JobPreviousCard from "./components/JobPreviousCard";
 import JobRelatedCard from "./components/JobRelatedCard";
 import JobsGetRelatedService from "../related";
 import JobsGetPreviousService from "../previous";
+import JobMetricsCard from "./components/JobMetricsCard";
+import JobsMetricsService from "../metrics";
 
 interface IJobDetailsState {
 }
@@ -15,6 +17,7 @@ interface IJobDetailsProps {
     jobsGetService: JobsGetService
     jobsGetRelatedService: JobsGetRelatedService
     jobsGetPreviousService: JobsGetPreviousService
+    metricsService: JobsMetricsService
 }
 
 export default class JobDetailsPage extends React.Component<IJobDetailsProps, IJobDetailsState> {
@@ -36,6 +39,9 @@ export default class JobDetailsPage extends React.Component<IJobDetailsProps, IJ
                     </Grid>
                     <Grid item xs={6}>
                         <JobPreviousCard id={this.props.id}  jobsGetPreviousService={this.props.jobsGetPreviousService}/>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <JobMetricsCard id={this.props.id} metricsService={this.props.metricsService} />
                     </Grid>
                 </Grid>
             </Box>

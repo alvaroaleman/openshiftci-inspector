@@ -235,6 +235,31 @@ export interface JobsListResponseBody {
 /**
  * 
  * @export
+ * @interface JobsMetricsResponseBody
+ */
+export interface JobsMetricsResponseBody {
+    /**
+     * 
+     * @type {Array<QuerySeries>}
+     * @memberof JobsMetricsResponseBody
+     */
+    matrix?: Array<QuerySeries>;
+    /**
+     * 
+     * @type {QueryPoint}
+     * @memberof JobsMetricsResponseBody
+     */
+    scalar?: QueryPoint;
+    /**
+     * 
+     * @type {Array<QuerySample>}
+     * @memberof JobsMetricsResponseBody
+     */
+    vector?: Array<QuerySample>;
+}
+/**
+ * 
+ * @export
  * @interface Pull
  */
 export interface Pull {
@@ -274,6 +299,82 @@ export interface Pull {
      * @memberof Pull
      */
     sha: string;
+}
+/**
+ * 
+ * @export
+ * @interface QueryLabel
+ */
+export interface QueryLabel {
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryLabel
+     */
+    name: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryLabel
+     */
+    value: string;
+}
+/**
+ * 
+ * @export
+ * @interface QueryPoint
+ */
+export interface QueryPoint {
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryPoint
+     */
+    timestamp: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryPoint
+     */
+    value: number;
+}
+/**
+ * 
+ * @export
+ * @interface QuerySample
+ */
+export interface QuerySample {
+    /**
+     * 
+     * @type {Array<QueryLabel>}
+     * @memberof QuerySample
+     */
+    labels: Array<QueryLabel>;
+    /**
+     * 
+     * @type {QueryPoint}
+     * @memberof QuerySample
+     */
+    point: QueryPoint;
+}
+/**
+ * 
+ * @export
+ * @interface QuerySeries
+ */
+export interface QuerySeries {
+    /**
+     * 
+     * @type {Array<QueryLabel>}
+     * @memberof QuerySeries
+     */
+    labels: Array<QueryLabel>;
+    /**
+     * 
+     * @type {Array<QueryPoint>}
+     * @memberof QuerySeries
+     */
+    points: Array<QueryPoint>;
 }
 /**
  * 
@@ -319,6 +420,53 @@ export const JobsApiAxiosParamCreator = function (configuration?: Configuration)
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Returns returns the queried metrics
+         * @param {string} iD ID of the job to fetch.
+         * @param {string} [query] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMetrics: async (iD: string, query?: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'iD' is not null or undefined
+            if (iD === null || iD === undefined) {
+                throw new RequiredError('iD','Required parameter iD was null or undefined when calling getMetrics.');
+            }
+            const localVarPath = `/jobs/{ID}/metrics`
+                .replace(`{${"ID"}}`, encodeURIComponent(String(iD)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (query !== undefined) {
+                localVarQueryParameter['query'] = query;
+            }
 
 
     
@@ -545,6 +693,20 @@ export const JobsApiFp = function(configuration?: Configuration) {
             };
         },
         /**
+         * Returns returns the queried metrics
+         * @param {string} iD ID of the job to fetch.
+         * @param {string} [query] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getMetrics(iD: string, query?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<JobsMetricsResponseBody>> {
+            const localVarAxiosArgs = await JobsApiAxiosParamCreator(configuration).getMetrics(iD, query, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * 
          * @summary Returns a list of previous jobs for the same build and branch.
          * @param {string} iD ID of the job to fetch.
@@ -617,6 +779,16 @@ export const JobsApiFactory = function (configuration?: Configuration, basePath?
             return JobsApiFp(configuration).getJob(iD, options).then((request) => request(axios, basePath));
         },
         /**
+         * Returns returns the queried metrics
+         * @param {string} iD ID of the job to fetch.
+         * @param {string} [query] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMetrics(iD: string, query?: string, options?: any): AxiosPromise<JobsMetricsResponseBody> {
+            return JobsApiFp(configuration).getMetrics(iD, query, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary Returns a list of previous jobs for the same build and branch.
          * @param {string} iD ID of the job to fetch.
@@ -677,6 +849,18 @@ export class JobsApi extends BaseAPI {
      */
     public getJob(iD: string, options?: any) {
         return JobsApiFp(this.configuration).getJob(iD, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Returns returns the queried metrics
+     * @param {string} iD ID of the job to fetch.
+     * @param {string} [query] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof JobsApi
+     */
+    public getMetrics(iD: string, query?: string, options?: any) {
+        return JobsApiFp(this.configuration).getMetrics(iD, query, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
