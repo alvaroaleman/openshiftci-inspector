@@ -68,9 +68,9 @@ func main() {
 		panic(err)
 	}
 
-	assets := map[string][]string{
+	assets := map[string]map[string]string{
 		"e2e-ovirt": {
-			"artifacts/e2e-ovirt/metrics/prometheus.tar",
+			"prometheus.tar": "artifacts/e2e-ovirt/metrics/prometheus.tar",
 		},
 	}
 

@@ -261,6 +261,7 @@ LIMIT 1`,
 }
 
 func (m *mysqlJobsStorage) ListJobs(params storage.ListJobsParams) (jobList []jobs.Job, err error) {
+	jobList = []jobs.Job{}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	where := ""

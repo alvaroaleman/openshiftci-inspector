@@ -6,10 +6,9 @@ This project aims to grab the logs, artifacts, etc from [Prow](https://prow.ci.o
 
 You can launch the MySQL database and Minio (S3) server using [docker-compose](https://docs.docker.com/compose/install/). (This should work with Podman too.)
 
-
 ### Running the scraper 
 
-Once you have a have a MySQL and Minio up and running you can run [cmd/scrape.go](cmd/scrape) using the following command:
+Once you have a MySQL and Minio up and running you can run [cmd/scrape.go](cmd/scrape) using the following command:
 
 ```bash
 export MYSQL_HOST=127.0.0.1

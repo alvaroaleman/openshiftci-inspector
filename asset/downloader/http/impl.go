@@ -20,7 +20,7 @@ type assetDownloader struct {
 }
 
 func (d *assetDownloader) Download(a asset.AssetWithJob) error {
-	response, err := d.client.Get(a.Job.AssetURL + a.AssetName)
+	response, err := d.client.Get(a.Job.AssetURL + a.AssetRemotePath)
 	if err != nil {
 		return fmt.Errorf("failed to download URL %s (%w)", a.Job.AssetURL+a.AssetName, err)
 	}

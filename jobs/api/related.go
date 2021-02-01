@@ -43,7 +43,6 @@ func (j *jobsGetRelatedAPI) GetRoutes() []api.Route {
 //
 // Responses:
 // default: JobsListResponse
-//
 func (j *jobsGetRelatedAPI) Handle(apiRequest api.Request, response api.Response) error {
 	request := JobsIDLimitRequest{}
 	if err := apiRequest.Decode(&request); err != nil {

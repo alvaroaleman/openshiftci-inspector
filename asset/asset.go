@@ -5,8 +5,9 @@ import (
 )
 
 type Asset struct {
-	JobID     string `json:"jobID"`
-	AssetName string `json:"assetName"`
+	JobID           string `json:"jobID"`
+	AssetName       string `json:"assetName"`
+	AssetRemotePath string `json:"assetRemotePath"`
 }
 
 type AssetWithJob struct {

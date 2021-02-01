@@ -23,9 +23,12 @@ import (
 	"syscall"
 	"time"
 
+	mysqlAssetIndex "github.com/janoszen/openshiftci-inspector/asset/indexstorage/mysql"
+	"github.com/janoszen/openshiftci-inspector/asset/storage/s3"
 	"github.com/janoszen/openshiftci-inspector/common/api"
 	mysqlCommon "github.com/janoszen/openshiftci-inspector/common/mysql"
 	jobsAPI "github.com/janoszen/openshiftci-inspector/jobs/api"
+	"github.com/janoszen/openshiftci-inspector/jobs/metrics"
 	mysqlJobsStorage "github.com/janoszen/openshiftci-inspector/jobs/storage/mysql"
 )
 
@@ -45,11 +48,35 @@ func main() {
 		panic(err)
 	}
 
+	pathStyleAccess := os.Getenv("AWS_S3_PATH_STYLE_ACCESS") != ""
+	assetStore, err := s3.NewS3AssetStorage(
+		s3.S3AssetStorageConfig{
+			AccessKey:            os.Getenv("AWS_ACCESS_KEY_ID"),
+			SecretKey:            os.Getenv("AWS_SECRET_ACCESS_KEY"),
+			Bucket:               os.Getenv("AWS_S3_BUCKET"),
+			Region:               os.Getenv("AWS_REGION"),
+			Endpoint:             os.Getenv("AWS_S3_ENDPOINT"),
+			ForcePathStyleAccess: pathStyleAccess,
+		},
+		logger,
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	assetIndexStorage, err := mysqlAssetIndex.NewMySQLAssetIndex(mysqlConfig, logger)
+	if err != nil {
+		panic(err)
+	}
+
+	queryBackend := metrics.NewQuery(assetIndexStorage, assetStore)
+
 	handlers := []api.API{
 		jobsAPI.NewJobsListAPI(jobsStorage),
 		jobsAPI.NewJobsGetAPI(jobsStorage, jobsStorage),
 		jobsAPI.NewJobsGetPreviousAPI(jobsStorage),
 		jobsAPI.NewJobsGetRelatedAPI(jobsStorage),
+		jobsAPI.NewJobsMetricsAPI(jobsStorage, assetStore, queryBackend),
 	}
 
 	srv, err := api.NewServer(
