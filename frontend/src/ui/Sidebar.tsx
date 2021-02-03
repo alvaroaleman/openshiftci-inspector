@@ -11,7 +11,8 @@ export default function Sidebar(props: ISidebarProps) {
     const history = useHistory();
     return <div>
         <Box m={2}>
-            <Typography variant={"h5"} component={"h1"} gutterBottom={true}>Openshift CI Inspector</Typography>
+            <img src={"/logo.svg"} alt={"A yellow fedora hat with a yellow propeller on top"} />
+            <Typography variant={"h5"} component={"h1"} gutterBottom={true} align={"center"}>Openshift CI Inspector</Typography>
         </Box>
         <Divider />
         <List>
