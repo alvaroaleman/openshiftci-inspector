@@ -75,10 +75,16 @@ export default class JobRelatedCard extends React.Component<IJobRelatedCardProps
                             {this.state.jobs.map(job => {
                                 return <TableRow key={job.id}>
                                     <TableCell>
-                                        <Box component={"span"} mr={1}><JobStatus status={job.status} fontSize={"inherit"} /></Box>
-                                        <Link to={"/" + job.id}>
-                                            {job.job}
-                                        </Link>
+                                        <Box display={"flex"} flexDirection={"row"}>
+                                            <Box component={"span"} mr={1} style={{paddingTop:"2px"}}>
+                                                <JobStatus status={job.status} fontSize={"inherit"} />
+                                            </Box>
+                                            <Box flex={1}>
+                                                <Link to={"/" + job.id}>
+                                                    {job.job}
+                                                </Link>
+                                            </Box>
+                                        </Box>
                                     </TableCell>
                                     <TableCell>
                                         <JobTime time={job.startTime} />

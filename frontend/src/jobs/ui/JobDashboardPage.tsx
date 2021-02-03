@@ -14,6 +14,7 @@ import JobsListService from "../list";
 import {Job} from "../../api-client";
 import JobStatus from "./components/JobStatus";
 import Link from "../../common/Link"
+import JobTime from "./components/JobTime";
 
 interface IDashboardState {
     jobFilter: string,
@@ -95,6 +96,7 @@ export default class JobDashboardPage extends React.Component<IDashboardProps, I
                     <TableHead>
                         <TableRow>
                             <TableCell>Job</TableCell>
+                            <TableCell>Started</TableCell>
                             <TableCell>Git repository</TableCell>
                             <TableCell>Base</TableCell>
                             <TableCell>Pulls</TableCell>
@@ -109,15 +111,20 @@ export default class JobDashboardPage extends React.Component<IDashboardProps, I
                     <TableBody>
                         {this.state.jobs.map(job => {
                                 return <TableRow key={job.id}>
-                                    <TableCell style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        flexWrap: 'wrap',
-                                    }}>
-                                        <Box component={"span"} mr={1}><JobStatus status={job.status} fontSize={"inherit"} /></Box>
-                                        <Link to={"/" + job.id}>
-                                            {job.job}
-                                        </Link>
+                                    <TableCell>
+                                        <Box display={"flex"} flexDirection={"row"}>
+                                            <Box component={"span"} mr={1} style={{paddingTop:"2px"}}>
+                                                <JobStatus status={job.status} fontSize={"inherit"} />
+                                            </Box>
+                                            <Box flex={1}>
+                                                <Link to={"/" + job.id}>
+                                                    {job.job}
+                                                </Link>
+                                            </Box>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell>
+                                        <JobTime time={job.startTime} />
                                     </TableCell>
                                     <TableCell>
                                         {job.gitOrg != null && job.gitRepo != null?<a href={job.gitRepoLink} target="_blank" rel={"noreferrer noopener"}>{job.gitOrg}/{job.gitRepo}</a>:null}

@@ -1,0 +1,10 @@
+.app__sidebar {
+    width:270px;
+    background:#292e34;
+    color:#ffffff;
+}
+
+.app__logo {
+    background:#3a3f43;
+    border-bottom: 1px solid #0a0f13;
+}

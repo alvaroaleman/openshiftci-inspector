@@ -12,9 +12,7 @@ class App extends React.Component<IAppProps> {
   render() {
     return <div className="app">
         {this.props.toastHandler}
-        <div className="app__sidebar">
-            <Sidebar />
-        </div>
+        <Sidebar />
         <div className="app__main">
             <div className="app__pages">
               {this.props.children}

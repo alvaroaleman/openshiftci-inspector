@@ -124,11 +124,11 @@ export default class JobInfoCard extends React.Component<IJobInfoCardProps, IJob
                 </CardContent>
                 <CardActions>
                     <a href={job.url}  target="_blank" rel={"noreferrer noopener"}>
-                        <Button variant="contained" color="primary" size={"small"}>Open in Prow&nbsp;<LaunchIcon style={{fontSize:"1em"}} /></Button>
+                        <Button variant="outlined" color="secondary" size={"small"}>Open in Prow&nbsp;<LaunchIcon style={{fontSize:"1em"}} /></Button>
                     </a>
                     {!job.assetURL?null:
                         <a href={job.assetURL}  target="_blank" rel={"noreferrer noopener"}>
-                            <Button variant="contained" color="primary" size={"small"}>Artifacts&nbsp;<LaunchIcon style={{fontSize:"1em"}} /></Button>
+                            <Button variant="outlined" color="secondary" size={"small"}>Artifacts&nbsp;<LaunchIcon style={{fontSize:"1em"}} /></Button>
                         </a>
                     }
                 </CardActions>

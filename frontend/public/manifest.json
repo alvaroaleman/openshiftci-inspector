@@ -1,6 +1,6 @@
 {
-  "short_name": "Your Orders",
-  "name": "Your Orders",
+  "short_name": "OCP CI Inspector",
+  "name": "Openshift CI Inspector",
   "icons": [
     {
       "src": "logo.svg",

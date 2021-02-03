@@ -74,10 +74,16 @@ export default class JobPreviousCard extends React.Component<IJobPreviousCardPro
                             {this.state.jobs.map(job => {
                                 return <TableRow key={job.id}>
                                     <TableCell>
-                                        <Box component={"span"} mr={1}><JobStatus status={job.status} fontSize={"inherit"} /></Box>
-                                        <Link to={"/" + job.id}>
-                                            <JobTime time={job.startTime} />
-                                        </Link>
+                                        <Box display={"flex"} flexDirection={"row"}>
+                                            <Box component={"span"} mr={1} style={{paddingTop:"2px"}}>
+                                                <JobStatus status={job.status} fontSize={"inherit"} />
+                                            </Box>
+                                            <Box flex={1}>
+                                                <Link to={"/" + job.id}>
+                                                    <JobTime time={job.startTime} />
+                                                </Link>
+                                            </Box>
+                                        </Box>
                                     </TableCell>
                                     <TableCell>{this.getPulls(job)}</TableCell>
                                 </TableRow>
