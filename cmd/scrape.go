@@ -72,6 +72,9 @@ func main() {
 		"e2e-ovirt": {
 			"prometheus.tar": "artifacts/e2e-ovirt/metrics/prometheus.tar",
 		},
+		"e2e-openstack": {
+			"prometheus.tar": "artifacts/e2e-openstack/metrics/prometheus.tar",
+		},
 	}
 
 	assetIndex := index.New(assetIndexStorage, logger, assets)
