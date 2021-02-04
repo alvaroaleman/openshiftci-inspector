@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/janoszen/openshiftci-inspector/asset"
-	"github.com/janoszen/openshiftci-inspector/asset/indexstorage"
-	"github.com/janoszen/openshiftci-inspector/asset/storage"
+	"github.com/janoszen/openshiftci_inspector/asset"
+	"github.com/janoszen/openshiftci_inspector/asset/indexstorage"
+	"github.com/janoszen/openshiftci_inspector/asset/storage"
 )
 
 type assetDownloader struct {

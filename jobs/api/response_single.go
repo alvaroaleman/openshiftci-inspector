@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/janoszen/openshiftci-inspector/jobs"
+	"github.com/janoszen/openshiftci_inspector/jobs"
 )
 
 // SingleJobResponse is the response to a request to get a single job in the Openshift CI.

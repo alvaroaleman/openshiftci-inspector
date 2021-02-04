@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/janoszen/openshiftci-inspector/jobs"
-	"github.com/janoszen/openshiftci-inspector/jobs/storage"
+	"github.com/janoszen/openshiftci_inspector/jobs"
+	"github.com/janoszen/openshiftci_inspector/jobs/storage"
 )
 
 func (c *cachingJobsAssetURLFetcher) Process(job jobs.Job) (jobs.JobWithAssetURL, error) {

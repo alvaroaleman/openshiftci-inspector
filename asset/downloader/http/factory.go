@@ -3,10 +3,10 @@ package http
 import (
 	"log"
 
-	"github.com/janoszen/openshiftci-inspector/asset/downloader"
-	"github.com/janoszen/openshiftci-inspector/asset/indexstorage"
-	"github.com/janoszen/openshiftci-inspector/asset/storage"
-	"github.com/janoszen/openshiftci-inspector/common/http"
+	"github.com/janoszen/openshiftci_inspector/asset/downloader"
+	"github.com/janoszen/openshiftci_inspector/asset/indexstorage"
+	"github.com/janoszen/openshiftci_inspector/asset/storage"
+	"github.com/janoszen/openshiftci_inspector/common/http"
 )
 
 func New(

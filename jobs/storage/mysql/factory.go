@@ -6,8 +6,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"github.com/janoszen/openshiftci-inspector/common/mysql"
-	"github.com/janoszen/openshiftci-inspector/jobs/storage"
+	"github.com/janoszen/openshiftci_inspector/common/mysql"
+	"github.com/janoszen/openshiftci_inspector/jobs/storage"
 )
 
 const (

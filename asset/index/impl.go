@@ -5,9 +5,9 @@ import (
 	"log"
 	"strings"
 
-	"github.com/janoszen/openshiftci-inspector/asset"
-	"github.com/janoszen/openshiftci-inspector/asset/indexstorage"
-	"github.com/janoszen/openshiftci-inspector/jobs"
+	"github.com/janoszen/openshiftci_inspector/asset"
+	"github.com/janoszen/openshiftci_inspector/asset/indexstorage"
+	"github.com/janoszen/openshiftci_inspector/jobs"
 )
 
 type assetIndexer struct {

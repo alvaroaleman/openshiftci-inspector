@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/janoszen/openshiftci-inspector/jobs"
-	"github.com/janoszen/openshiftci-inspector/jobs/storage"
+	"github.com/janoszen/openshiftci_inspector/jobs"
+	"github.com/janoszen/openshiftci_inspector/jobs/storage"
 )
 
 type mysqlJobsStorage struct {

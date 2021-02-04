@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 
-	"github.com/janoszen/openshiftci-inspector/asset/storage"
+	"github.com/janoszen/openshiftci_inspector/asset/storage"
 )
 
 // NewS3AssetStorage creates an asset storage that stores assets on an S3-compatible object storage.

@@ -1,7 +1,7 @@
 package scraper
 
 import (
-	"github.com/janoszen/openshiftci-inspector/common"
+	"github.com/janoszen/openshiftci_inspector/common"
 )
 
 type Scraper interface {

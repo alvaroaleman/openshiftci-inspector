@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 
-	"github.com/janoszen/openshiftci-inspector/asset"
+	"github.com/janoszen/openshiftci_inspector/asset"
 )
 
 type s3AssetStorage struct {
@@ -18,7 +18,7 @@ type s3AssetStorage struct {
 	logger *log.Logger
 }
 
-func (s *s3AssetStorage) Shutdown(ctx context.Context) {
+func (s *s3AssetStorage) Shutdown(_ context.Context) {
 }
 
 func (s *s3AssetStorage) Store(asset asset.Asset, mime string, data []byte) error {

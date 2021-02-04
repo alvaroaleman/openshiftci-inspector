@@ -23,13 +23,13 @@ import (
 	"syscall"
 	"time"
 
-	mysqlAssetIndex "github.com/janoszen/openshiftci-inspector/asset/indexstorage/mysql"
-	"github.com/janoszen/openshiftci-inspector/asset/storage/s3"
-	"github.com/janoszen/openshiftci-inspector/common/api"
-	mysqlCommon "github.com/janoszen/openshiftci-inspector/common/mysql"
-	jobsAPI "github.com/janoszen/openshiftci-inspector/jobs/api"
-	"github.com/janoszen/openshiftci-inspector/jobs/metrics"
-	mysqlJobsStorage "github.com/janoszen/openshiftci-inspector/jobs/storage/mysql"
+	mysqlAssetIndex "github.com/janoszen/openshiftci_inspector/asset/indexstorage/mysql"
+	"github.com/janoszen/openshiftci_inspector/asset/storage/s3"
+	"github.com/janoszen/openshiftci_inspector/common/api"
+	mysqlCommon "github.com/janoszen/openshiftci_inspector/common/mysql"
+	jobsAPI "github.com/janoszen/openshiftci_inspector/jobs/api"
+	"github.com/janoszen/openshiftci_inspector/jobs/metrics"
+	mysqlJobsStorage "github.com/janoszen/openshiftci_inspector/jobs/storage/mysql"
 )
 
 func main() {

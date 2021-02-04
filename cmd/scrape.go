@@ -8,17 +8,17 @@ import (
 	"syscall"
 	"time"
 
-	httpDownloader "github.com/janoszen/openshiftci-inspector/asset/downloader/http"
-	"github.com/janoszen/openshiftci-inspector/asset/index"
-	mysqlAssetIndex "github.com/janoszen/openshiftci-inspector/asset/indexstorage/mysql"
-	"github.com/janoszen/openshiftci-inspector/asset/storage/s3"
-	commonHTTP "github.com/janoszen/openshiftci-inspector/common/http"
-	mysqlCommon "github.com/janoszen/openshiftci-inspector/common/mysql"
-	"github.com/janoszen/openshiftci-inspector/jobs/asseturl/caching"
-	assetURLHTTP "github.com/janoszen/openshiftci-inspector/jobs/asseturl/http"
-	scrapeHTTP "github.com/janoszen/openshiftci-inspector/jobs/scrape/http"
-	"github.com/janoszen/openshiftci-inspector/jobs/storage/mysql"
-	"github.com/janoszen/openshiftci-inspector/scraper"
+	httpDownloader "github.com/janoszen/openshiftci_inspector/asset/downloader/http"
+	"github.com/janoszen/openshiftci_inspector/asset/index"
+	mysqlAssetIndex "github.com/janoszen/openshiftci_inspector/asset/indexstorage/mysql"
+	"github.com/janoszen/openshiftci_inspector/asset/storage/s3"
+	commonHTTP "github.com/janoszen/openshiftci_inspector/common/http"
+	mysqlCommon "github.com/janoszen/openshiftci_inspector/common/mysql"
+	"github.com/janoszen/openshiftci_inspector/jobs/asseturl/caching"
+	assetURLHTTP "github.com/janoszen/openshiftci_inspector/jobs/asseturl/http"
+	scrapeHTTP "github.com/janoszen/openshiftci_inspector/jobs/scrape/http"
+	"github.com/janoszen/openshiftci_inspector/jobs/storage/mysql"
+	"github.com/janoszen/openshiftci_inspector/scraper"
 )
 
 func main() {

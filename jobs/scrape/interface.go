@@ -1,7 +1,7 @@
 package scrape
 
 import (
-	"github.com/janoszen/openshiftci-inspector/jobs"
+	"github.com/janoszen/openshiftci_inspector/jobs"
 )
 
 // JobsScraper scrapes jobs off the Prow web UI.

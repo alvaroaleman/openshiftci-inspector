@@ -1,7 +1,7 @@
 package asseturl
 
 import (
-	"github.com/janoszen/openshiftci-inspector/jobs"
+	"github.com/janoszen/openshiftci_inspector/jobs"
 )
 
 // JobAssetURLFetcher scrapes the asset URL from the job page if not already stored.

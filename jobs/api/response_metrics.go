@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/janoszen/openshiftci-inspector/jobs/metrics"
+	"github.com/janoszen/openshiftci_inspector/jobs/metrics"
 )
 
 // JobsMetricsResponse is a response to a metrics query.

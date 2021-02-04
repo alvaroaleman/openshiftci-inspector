@@ -14,9 +14,9 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/janoszen/openshiftci-inspector/asset"
-	"github.com/janoszen/openshiftci-inspector/asset/indexstorage"
-	"github.com/janoszen/openshiftci-inspector/asset/storage"
+	"github.com/janoszen/openshiftci_inspector/asset"
+	"github.com/janoszen/openshiftci_inspector/asset/indexstorage"
+	"github.com/janoszen/openshiftci_inspector/asset/storage"
 	"github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/promql"
 	"github.com/prometheus/prometheus/tsdb"

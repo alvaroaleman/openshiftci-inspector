@@ -1,8 +1,8 @@
 package http
 
 import (
-	"github.com/janoszen/openshiftci-inspector/common/http"
-	"github.com/janoszen/openshiftci-inspector/jobs/asseturl"
+	"github.com/janoszen/openshiftci_inspector/common/http"
+	"github.com/janoszen/openshiftci_inspector/jobs/asseturl"
 )
 
 func NewHTTPAssetURLFetcher(config http.Config) (asseturl.JobAssetURLFetcher, error) {

@@ -1,8 +1,8 @@
 package api
 
 import (
-	"github.com/janoszen/openshiftci-inspector/common/api"
-	"github.com/janoszen/openshiftci-inspector/jobs/storage"
+	"github.com/janoszen/openshiftci_inspector/common/api"
+	"github.com/janoszen/openshiftci_inspector/jobs/storage"
 )
 
 func NewJobsListAPI(jobsStorage storage.JobsStorage) api.API {

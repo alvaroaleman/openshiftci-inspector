@@ -6,12 +6,12 @@ import (
 	"log"
 	"time"
 
-	"github.com/janoszen/openshiftci-inspector/asset/downloader"
-	"github.com/janoszen/openshiftci-inspector/asset/index"
-	"github.com/janoszen/openshiftci-inspector/jobs"
-	"github.com/janoszen/openshiftci-inspector/jobs/asseturl"
-	"github.com/janoszen/openshiftci-inspector/jobs/scrape"
-	"github.com/janoszen/openshiftci-inspector/jobs/storage"
+	"github.com/janoszen/openshiftci_inspector/asset/downloader"
+	"github.com/janoszen/openshiftci_inspector/asset/index"
+	"github.com/janoszen/openshiftci_inspector/jobs"
+	"github.com/janoszen/openshiftci_inspector/jobs/asseturl"
+	"github.com/janoszen/openshiftci_inspector/jobs/scrape"
+	"github.com/janoszen/openshiftci_inspector/jobs/storage"
 )
 
 type scraperImpl struct {
@@ -73,7 +73,7 @@ loop:
 	}
 }
 
-func (p *scraperImpl) Shutdown(ctx context.Context) {
+func (p *scraperImpl) Shutdown(_ context.Context) {
 	p.cancelRunContext()
 }
 

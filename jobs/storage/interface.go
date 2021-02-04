@@ -4,8 +4,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/janoszen/openshiftci-inspector/common"
-	"github.com/janoszen/openshiftci-inspector/jobs"
+	"github.com/janoszen/openshiftci_inspector/common"
+	"github.com/janoszen/openshiftci_inspector/jobs"
 )
 
 var ErrJobNotFound = errors.New("job not found")

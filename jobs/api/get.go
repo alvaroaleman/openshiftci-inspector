@@ -3,9 +3,9 @@ package api
 import (
 	"errors"
 
-	"github.com/janoszen/openshiftci-inspector/common/api"
-	"github.com/janoszen/openshiftci-inspector/jobs"
-	"github.com/janoszen/openshiftci-inspector/jobs/storage"
+	"github.com/janoszen/openshiftci_inspector/common/api"
+	"github.com/janoszen/openshiftci_inspector/jobs"
+	"github.com/janoszen/openshiftci_inspector/jobs/storage"
 )
 
 func NewJobsGetAPI(

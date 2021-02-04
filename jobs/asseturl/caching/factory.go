@@ -3,8 +3,8 @@ package caching
 import (
 	"log"
 
-	"github.com/janoszen/openshiftci-inspector/jobs/asseturl"
-	"github.com/janoszen/openshiftci-inspector/jobs/storage"
+	"github.com/janoszen/openshiftci_inspector/jobs/asseturl"
+	"github.com/janoszen/openshiftci_inspector/jobs/storage"
 )
 
 func New(

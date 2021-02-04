@@ -1,7 +1,6 @@
-module github.com/janoszen/openshiftci-inspector
+module github.com/janoszen/openshiftci_inspector
 
-go 1.14
-
+go 1.16
 
 require (
 	github.com/aws/aws-sdk-go v1.36.13

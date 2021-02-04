@@ -3,7 +3,7 @@ package api_test
 import (
 	"testing"
 
-	"github.com/janoszen/openshiftci-inspector/common/api"
+	"github.com/janoszen/openshiftci_inspector/common/api"
 )
 
 type test struct {

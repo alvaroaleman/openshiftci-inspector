@@ -1,7 +1,7 @@
 package downloader
 
 import (
-	"github.com/janoszen/openshiftci-inspector/asset"
+	"github.com/janoszen/openshiftci_inspector/asset"
 )
 
 // AssetDownloader is responsible for downloading assets based on the records.

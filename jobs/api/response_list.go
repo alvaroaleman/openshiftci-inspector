@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/janoszen/openshiftci-inspector/jobs"
+	"github.com/janoszen/openshiftci_inspector/jobs"
 )
 
 // JobsListResponse is the response to a request to list jobs in the Openshift CI.

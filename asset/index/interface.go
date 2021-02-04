@@ -1,8 +1,8 @@
 package index
 
 import (
-	"github.com/janoszen/openshiftci-inspector/asset"
-	"github.com/janoszen/openshiftci-inspector/jobs"
+	"github.com/janoszen/openshiftci_inspector/asset"
+	"github.com/janoszen/openshiftci_inspector/jobs"
 )
 
 // AssetIndexer is a storage for a list of assets for a job.

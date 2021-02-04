@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/janoszen/openshiftci-inspector/jobs"
+	"github.com/janoszen/openshiftci_inspector/jobs"
 )
 
 type httpJobsScraper struct {

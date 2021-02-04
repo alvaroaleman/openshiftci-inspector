@@ -3,7 +3,7 @@ package index
 import (
 	"log"
 
-	"github.com/janoszen/openshiftci-inspector/asset/indexstorage"
+	"github.com/janoszen/openshiftci_inspector/asset/indexstorage"
 )
 
 func New(assetIndex indexstorage.AssetIndex, logger *log.Logger, assets map[string]map[string]string) AssetIndexer {

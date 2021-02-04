@@ -1,8 +1,8 @@
 package storage
 
 import (
-	"github.com/janoszen/openshiftci-inspector/asset"
-	"github.com/janoszen/openshiftci-inspector/common"
+	"github.com/janoszen/openshiftci_inspector/asset"
+	"github.com/janoszen/openshiftci_inspector/common"
 )
 
 // AssetStorage is a simplified API to store and retrieve assets for a job.

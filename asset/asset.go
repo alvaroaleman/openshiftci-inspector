@@ -1,7 +1,7 @@
 package asset
 
 import (
-	"github.com/janoszen/openshiftci-inspector/jobs"
+	"github.com/janoszen/openshiftci_inspector/jobs"
 )
 
 type Asset struct {

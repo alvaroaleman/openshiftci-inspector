@@ -1,14 +1,18 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"net/http"
 	"sync"
 
 	"github.com/gorilla/mux"
+
+	"github.com/janoszen/openshiftci_inspector/frontend"
 )
 
 type Server interface {
@@ -88,7 +92,10 @@ func (s *server) Start() error {
 		}
 	}
 
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./frontend/build/")))
+	fs := frontend.GetFilesystem()
+	r.PathPrefix("/").Handler(&customFileServer{
+		backend: http.FileServer(fs),
+	})
 
 	s.srv = &http.Server{
 		Handler: r,
@@ -128,5 +135,53 @@ func (s *server) handleError(err error, response Response) {
 	if err != nil {
 		response.SetStatus(http.StatusInternalServerError)
 		s.logger.Printf("Error while handling request (%v)\n", err)
+	}
+}
+
+type customFileServer struct {
+	backend http.Handler
+}
+
+type interceptingWriter struct {
+	header     http.Header
+	statusCode int
+	writer     io.Writer
+}
+
+func (w *interceptingWriter) Header() http.Header {
+	return w.header
+}
+
+func (w *interceptingWriter) Write(bytes []byte) (int, error) {
+	return w.writer.Write(bytes)
+}
+
+func (w *interceptingWriter) WriteHeader(statusCode int) {
+	w.statusCode = statusCode
+}
+
+func (c *customFileServer) ServeHTTP(writer http.ResponseWriter, r *http.Request) {
+	buffer := &bytes.Buffer{}
+	iWriter := &interceptingWriter{
+		header:     map[string][]string{},
+		statusCode: 200,
+		writer:     buffer,
+	}
+	c.backend.ServeHTTP(iWriter, r)
+	if r.URL.Path != "/" && iWriter.statusCode == 404 {
+		r.URL.Path = "/"
+		c.backend.ServeHTTP(writer, r)
+	} else {
+		for headerName, headerValues := range iWriter.header {
+			for i, headerValue := range headerValues {
+				if i == 0 {
+					writer.Header().Set(headerName, headerValue)
+				} else {
+					writer.Header().Add(headerName, headerValue)
+				}
+			}
+		}
+		writer.WriteHeader(iWriter.statusCode)
+		_, _ = writer.Write(buffer.Bytes())
 	}
 }
