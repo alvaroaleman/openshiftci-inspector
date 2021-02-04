@@ -1,6 +1,6 @@
 import {
-    Box,
-    LinearProgress,
+    Box, Button,
+    LinearProgress, ListItemIcon, ListItemText, Menu, MenuItem,
     Paper,
     Table,
     TableBody,
@@ -15,6 +15,111 @@ import {Job} from "../../api-client";
 import JobStatus from "./components/JobStatus";
 import Link from "../../common/Link"
 import JobTime from "./components/JobTime";
+import SearchIcon from '@material-ui/icons/Search';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import ImportContactsIcon from '@material-ui/icons/ImportContacts';
+import { useHistory } from "react-router-dom";
+
+interface IPullsProps {
+    job: Job
+}
+
+function Pulls(props: IPullsProps) {
+    if (props.job.pulls == null) {
+        return null
+    }
+    return <React.Fragment>{props.job.pulls.map(pull => {
+        return <span key={pull.number}><a href={pull.pullLink} target="_blank" rel={"noreferrer noopener"}>{pull.number}</a> by <a href={pull.authorLink} target="_blank" rel={"noreferrer noopener"}>{pull.author}</a></span>
+    })}</React.Fragment>
+}
+
+interface IRowProps {
+    job: Job,
+    onSearch: (query: string, repository: string) => void
+}
+
+function Row(props: IRowProps) {
+    const history = useHistory();
+
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const job = props.job
+
+    return (
+        <TableRow key={job.id}>
+            <TableCell>
+                <Box display={"flex"} flexDirection={"row"}>
+                    <Box component={"span"} mr={1} style={{paddingTop:"4px"}}>
+                        <JobStatus status={job.status} fontSize={"inherit"} />
+                    </Box>
+                    <Box flex={1}>
+                        <Link to={"/" + job.id} title={"Click to show details page..."}>
+                            {job.job}
+                        </Link>
+                    </Box>
+                </Box>
+            </TableCell>
+            <TableCell>
+                <JobTime time={job.startTime} />
+            </TableCell>
+            <TableCell>
+                {job.gitOrg != null && job.gitRepo != null?<a href={job.gitRepoLink} target="_blank" rel={"noreferrer noopener"}>{job.gitOrg}/{job.gitRepo}</a>:null}
+            </TableCell>
+            <TableCell>{job.gitBaseRef}</TableCell>
+            <TableCell><Pulls job={job} /></TableCell>
+            <TableCell width={"2rem"}>
+                <Box display={"inline-block"} ml={1}>
+                    <Button size={"small"} aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
+                        <MoreVertIcon fontSize={"small"} />
+                    </Button>
+                </Box>
+                <Menu
+                    anchorEl={anchorEl}
+                    keepMounted
+                    open={Boolean(anchorEl)}
+                    onClose={handleClose}
+                >
+                    <MenuItem onClick={() => {
+                        handleClose()
+                        history.push("/" + job.id)
+                    }}>
+                        <ListItemIcon><ImportContactsIcon /></ListItemIcon>
+                        <ListItemText>Open Details Page...</ListItemText>
+                    </MenuItem>
+                    <MenuItem onClick={() => {
+                        handleClose()
+                        props.onSearch(job.job, "")
+                    }}>
+                        <ListItemIcon><SearchIcon /></ListItemIcon>
+                        <ListItemText>Show only &ldquo;<code>{job.job}</code>&rdquo; jobs</ListItemText>
+                    </MenuItem>
+                    {job.gitOrg != null && job.gitRepo != null?<MenuItem onClick={() => {
+                        handleClose()
+                        props.onSearch("", job.gitOrg as string + "/" + job.gitRepo)
+                    }}>
+                        <ListItemIcon><SearchIcon /></ListItemIcon>
+                        <ListItemText>Show only jobs for the &ldquo;<code>{job.gitOrg}/{job.gitRepo}</code>&rdquo; repository</ListItemText>
+                    </MenuItem>:null}
+                    {job.gitOrg != null && job.gitRepo != null?<MenuItem onClick={() => {
+                        handleClose()
+                        props.onSearch(job.job, job.gitOrg as string + "/" + job.gitRepo)
+                    }}>
+                        <ListItemIcon><SearchIcon /></ListItemIcon>
+                        <ListItemText>Show only &ldquo;<code>{job.job}</code>&rdquo; jobs for the &ldquo;<code>{job.gitOrg}/{job.gitRepo}</code>&rdquo; repository</ListItemText>
+                    </MenuItem>:null}
+                </Menu>
+            </TableCell>
+        </TableRow>
+    );
+}
 
 interface IDashboardState {
     jobFilter: string,
@@ -68,6 +173,19 @@ export default class JobDashboardPage extends React.Component<IDashboardProps, I
         this.props.jobsListService.setFilters(this.state.jobFilter, this.state.repoFilter)
     }
 
+    searchFor = (keyword: string, repository: string) => {
+        if (this.state.typingTimer) {
+            window.clearTimeout(this.state.typingTimer)
+        }
+
+        this.setState({
+            jobFilter: keyword,
+            repoFilter: repository,
+            typingTimer:undefined,
+        })
+        this.props.jobsListService.setFilters(keyword, repository)
+    }
+
     changeJobFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (this.state.typingTimer) {
             window.clearTimeout(this.state.typingTimer)
@@ -90,6 +208,7 @@ export default class JobDashboardPage extends React.Component<IDashboardProps, I
 
     render = () => {
         return <Box m={2}>
+            <h1>Last job runs</h1>
             <TableContainer component={Paper}>
                 {this.state.isRefreshing?<LinearProgress />:null}
                 <Table size="small">
@@ -100,6 +219,7 @@ export default class JobDashboardPage extends React.Component<IDashboardProps, I
                             <TableCell>Git repository</TableCell>
                             <TableCell>Base</TableCell>
                             <TableCell>Pulls</TableCell>
+                            <TableCell width={"2rem"} />
                         </TableRow>
                         <TableRow>
                             <TableCell colSpan={4}>
@@ -109,43 +229,10 @@ export default class JobDashboardPage extends React.Component<IDashboardProps, I
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {this.state.jobs.map(job => {
-                                return <TableRow key={job.id}>
-                                    <TableCell>
-                                        <Box display={"flex"} flexDirection={"row"}>
-                                            <Box component={"span"} mr={1} style={{paddingTop:"2px"}}>
-                                                <JobStatus status={job.status} fontSize={"inherit"} />
-                                            </Box>
-                                            <Box flex={1}>
-                                                <Link to={"/" + job.id}>
-                                                    {job.job}
-                                                </Link>
-                                            </Box>
-                                        </Box>
-                                    </TableCell>
-                                    <TableCell>
-                                        <JobTime time={job.startTime} />
-                                    </TableCell>
-                                    <TableCell>
-                                        {job.gitOrg != null && job.gitRepo != null?<a href={job.gitRepoLink} target="_blank" rel={"noreferrer noopener"}>{job.gitOrg}/{job.gitRepo}</a>:null}
-                                    </TableCell>
-                                    <TableCell>{job.gitBaseRef}</TableCell>
-                                    <TableCell>{this.getPulls(job)}</TableCell>
-                                </TableRow>
-                            })
-                        }
+                        {this.state.jobs.map(job => <Row job={job} onSearch={this.searchFor} />)}
                     </TableBody>
                 </Table>
             </TableContainer>
         </Box>;
-    }
-
-    getPulls = (job: Job) => {
-        if (job.pulls == null) {
-            return null
-        }
-        return job.pulls.map(pull => {
-            return <span key={pull.number}><a href={pull.pullLink} target="_blank" rel={"noreferrer noopener"}>{pull.number}</a> by <a href={pull.authorLink} target="_blank" rel={"noreferrer noopener"}>{pull.author}</a></span>
-        })
     }
 }
