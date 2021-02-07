@@ -170,7 +170,6 @@ INSERT INTO jobs (
 		job.GitBaseRef,
 		job.GitBaseSHA,
 		job.GitBaseLink,
-
 		job.Status,
 		job.StartTime,
 		job.PendingTime,
