@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 )
@@ -40,4 +41,23 @@ func (c *Config) ConnectString() string {
 		host = fmt.Sprintf("%s:%d", host, c.Port)
 	}
 	return fmt.Sprintf("%s:%s@tcp(%s)/%s", c.Username, c.Password, host, c.Database)
+}
+
+func (c *Config) CreateMySQLDB() (*sql.DB, error) {
+	if err := c.Validate(); err != nil {
+		return nil, err
+	}
+	db, err := sql.Open(
+		"mysql",
+		c.ConnectString(),
+	)
+	if err != nil {
+		return nil, err
+	}
+	if _, err := db.Exec(
+		`CREATE DATABASE IF NOT EXISTS ` + c.Database,
+	); err != nil {
+		return nil, fmt.Errorf("failed to create database (%w)", err)
+	}
+	return db, nil
 }

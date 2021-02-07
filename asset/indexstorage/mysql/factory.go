@@ -1,7 +1,6 @@
 package mysql
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
@@ -26,20 +25,9 @@ CREATE TABLE IF NOT EXISTS job_assets (
 
 // NewMySQLAssetIndex creates a MySQL storage for asset indexes.
 func NewMySQLAssetIndex(config mysql.Config, logger *log.Logger) (indexstorage.AssetIndex, error) {
-	if err := config.Validate(); err != nil {
-		return nil, err
-	}
-	db, err := sql.Open(
-		"mysql",
-		config.ConnectString(),
-	)
+	db, err := config.CreateMySQLDB()
 	if err != nil {
 		return nil, err
-	}
-	if _, err := db.Exec(
-		`CREATE DATABASE IF NOT EXISTS ` + config.Database,
-	); err != nil {
-		return nil, fmt.Errorf("failed to create database (%w)", err)
 	}
 	if _, err := db.Exec(createTableSQL); err != nil {
 		return nil, fmt.Errorf("failed to create assets table (%w)", err)

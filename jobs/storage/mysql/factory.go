@@ -1,7 +1,6 @@
 package mysql
 
 import (
-	"database/sql"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -63,20 +62,9 @@ CREATE TABLE IF NOT EXISTS job_pulls
 
 // NewMySQLJobsStorage creates a MySQL storage for jobs.
 func NewMySQLJobsStorage(config mysql.Config) (storage.CompoundJobsStorage, error) {
-	if err := config.Validate(); err != nil {
-		return nil, err
-	}
-	db, err := sql.Open(
-		"mysql",
-		config.ConnectString(),
-	)
+	db, err := config.CreateMySQLDB()
 	if err != nil {
 		return nil, err
-	}
-	if _, err := db.Exec(
-		`CREATE DATABASE IF NOT EXISTS ` + config.Database,
-	); err != nil {
-		return nil, fmt.Errorf("failed to create database (%w)", err)
 	}
 	if _, err := db.Exec(createJobsTableSQL); err != nil {
 		return nil, fmt.Errorf("failed to create jobs table (%w)", err)
