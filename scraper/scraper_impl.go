@@ -89,20 +89,20 @@ func (p *scraperImpl) indexJob(job jobs.Job) {
 
 	jobWithAsset, err := p.assetURLFetcher.Process(job)
 	if err != nil {
-		p.logger.Printf("\nError while fetching asset URL (%v)\033[F", err)
+		p.logger.Printf("\nError while fetching asset URL (%v)", err)
 		return
 	}
 
 	assets, err := p.assetIndex.GetMissingAssets(jobWithAsset)
 	if err != nil {
-		p.logger.Printf("\nError while generating missing assets for job %v (%v)\033[F", job.ID, err)
+		p.logger.Printf("\nError while generating missing assets for job %v (%v)", job.ID, err)
 		return
 	}
 
 	for _, asset := range assets {
 		err := p.assetDownloader.Download(asset)
 		if err != nil {
-			p.logger.Printf("\nError while downloading asset (%v)\033[F", err)
+			p.logger.Printf("\nError while downloading asset (%v)", err)
 		}
 	}
 }
