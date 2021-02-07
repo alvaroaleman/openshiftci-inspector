@@ -42,13 +42,7 @@ loop:
 
 				p.indexJob(j)
 
-				complete := int(100 * float32(completeJobs) / float32(totalJobs))
-				bars := ""
-				char := "█"
-				for i := 0; i < complete; i = i + 2 {
-					bars += char
-				}
-				fmt.Printf("\r[%-50s] %3d%% (%d/%d)", bars, complete, completeJobs, totalJobs)
+				printCompletionPercentage(completeJobs, totalJobs)
 
 				select {
 				case <-p.runContext.Done():
@@ -71,6 +65,16 @@ loop:
 		case <-time.After(10 * time.Minute):
 		}
 	}
+}
+
+func printCompletionPercentage(completeJobs int, totalJobs int) {
+	complete := int(100 * float32(completeJobs) / float32(totalJobs))
+	bars := ""
+	char := "█"
+	for i := 0; i < complete; i = i + 2 {
+		bars += char
+	}
+	fmt.Printf("\r[%-50s] %3d%% (%d/%d)", bars, complete, completeJobs, totalJobs)
 }
 
 func (p *scraperImpl) Shutdown(_ context.Context) {
