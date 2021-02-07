@@ -95,7 +95,7 @@ func (p *scraperImpl) indexJob(job jobs.Job) {
 
 	assets, err := p.assetIndex.GetMissingAssets(jobWithAsset)
 	if err != nil {
-		p.logger.Printf("\nError while loading missing assets (%v)\033[F", err)
+		p.logger.Printf("\nError while generating missing assets for job %v (%v)\033[F", job.ID, err)
 		return
 	}
 
