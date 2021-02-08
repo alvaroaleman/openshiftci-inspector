@@ -7,7 +7,6 @@ import (
 
 // AssetIndexer is a storage for a list of assets for a job.
 type AssetIndexer interface {
-	// GetMissingAssets is a processor that checks which assets are present for a job, triggers the
-	// retrieval, and then emits a list of assets for a job.
+	// GetMissingAssets returns a list of assets that are required but missing for the given job
 	GetMissingAssets(job jobs.JobWithAssetURL) ([]asset.AssetWithJob, error)
 }

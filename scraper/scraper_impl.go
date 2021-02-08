@@ -42,13 +42,7 @@ loop:
 
 				p.indexJob(j)
 
-				complete := int(100 * float32(completeJobs) / float32(totalJobs))
-				bars := ""
-				char := "█"
-				for i := 0; i < complete; i = i + 2 {
-					bars += char
-				}
-				fmt.Printf("\r[%-50s] %3d%% (%d/%d)", bars, complete, completeJobs, totalJobs)
+				printCompletionPercentage(completeJobs, totalJobs)
 
 				select {
 				case <-p.runContext.Done():
@@ -73,6 +67,16 @@ loop:
 	}
 }
 
+func printCompletionPercentage(completeJobs int, totalJobs int) {
+	complete := int(100 * float32(completeJobs) / float32(totalJobs))
+	bars := ""
+	char := "█"
+	for i := 0; i < complete; i = i + 2 {
+		bars += char
+	}
+	fmt.Printf("\r[%-50s] %3d%% (%d/%d)", bars, complete, completeJobs, totalJobs)
+}
+
 func (p *scraperImpl) Shutdown(_ context.Context) {
 	p.cancelRunContext()
 }
@@ -85,20 +89,20 @@ func (p *scraperImpl) indexJob(job jobs.Job) {
 
 	jobWithAsset, err := p.assetURLFetcher.Process(job)
 	if err != nil {
-		p.logger.Printf("\nError while fetching asset URL (%v)\033[F", err)
+		p.logger.Printf("\nError while fetching asset URL (%v)", err)
 		return
 	}
 
 	assets, err := p.assetIndex.GetMissingAssets(jobWithAsset)
 	if err != nil {
-		p.logger.Printf("\nError while loading missing assets (%v)\033[F", err)
+		p.logger.Printf("\nError while generating missing assets for job %v (%v)", job.ID, err)
 		return
 	}
 
 	for _, asset := range assets {
 		err := p.assetDownloader.Download(asset)
 		if err != nil {
-			p.logger.Printf("\nError while downloading asset (%v)\033[F", err)
+			p.logger.Printf("\nError while downloading asset (%v)", err)
 		}
 	}
 }

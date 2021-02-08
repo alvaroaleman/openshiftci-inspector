@@ -39,10 +39,8 @@ func (h *httpJobsScraper) Scrape() ([]jobs.Job, error) {
 		return nil, err
 	}
 
-	i := 0
 	var jobList []jobs.Job
 	for _, rawJob := range list.Items {
-		i++
 		jobNameSafe := ""
 		if len(rawJob.Spec.PodSpec.Containers) > 0 {
 			for _, env := range rawJob.Spec.PodSpec.Containers[0].Env {
