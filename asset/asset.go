@@ -12,5 +12,5 @@ type Asset struct {
 
 type AssetWithJob struct {
 	Asset `json:",inline"`
-	Job   jobs.JobWithAssetURL `json:"job"`
+	Job   job.JobWithAssetURL `json:"job"`
 }

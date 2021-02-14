@@ -22,5 +22,5 @@ type SingleJobResponseBody struct {
 	// Job is a single job record.
 	//
 	// required: true
-	Job jobs.JobWithAssetURL `json:"job"`
+	Job job.JobWithAssetURL `json:"job"`
 }

@@ -1,0 +1,55 @@
+{
+  "name": "openshiftci-inspector",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@blueprintjs/core": "^3.37.0",
+    "@blueprintjs/datetime": "^3.20.1",
+    "@blueprintjs/select": "^3.15.1",
+    "@blueprintjs/table": "^3.8.19",
+    "@blueprintjs/timezone": "^3.8.1",
+    "@material-ui/core": "latest",
+    "@material-ui/icons": "^4.11.2",
+    "@types/jest": "^26.0.20",
+    "@types/moment-timezone": "^0.5.13",
+    "@types/node": "^14.14.22",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "axios": "^0.21.1",
+    "js-joda": "^1.10.1",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.32",
+    "nivo": "^0.31.0",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "^3.4.4",
+    "typescript": "^4.1.3"
+  },
+  "devDependencies": {
+    "@nivo/core": "^0.67.0",
+    "@nivo/line": "^0.67.0",
+    "@openapitools/openapi-generator-cli": "^2.1.18",
+    "@types/react-router-dom": "^5.1.7"
+  },
+  "proxy": "http://localhost:8080",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "client": ".\\node_modules\\.bin\\openapi-generator-cli generate -i ../swagger.json -o ./src/api-client -g typescript-axios --artifact-version 1.0.0-SNAPSHOT"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

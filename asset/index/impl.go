@@ -16,7 +16,7 @@ type assetIndexer struct {
 	logger  *log.Logger
 }
 
-func (a *assetIndexer) GetMissingAssets(job jobs.JobWithAssetURL) ([]asset.AssetWithJob, error) {
+func (a *assetIndexer) GetMissingAssets(job job.JobWithAssetURL) ([]asset.AssetWithJob, error) {
 	jobID := job.ID
 	var assets []asset.AssetWithJob
 	for jobPart, assetList := range a.assets {

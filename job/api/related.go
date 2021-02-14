@@ -90,7 +90,7 @@ func (j *jobsGetRelatedAPI) Handle(apiRequest api.Request, response api.Response
 		return err
 	}
 	if jobList == nil {
-		jobList = []jobs.Job{}
+		jobList = []job.Job{}
 	}
 	return response.Encode(
 		JobsListResponseBody{

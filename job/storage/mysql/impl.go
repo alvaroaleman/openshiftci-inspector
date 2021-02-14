@@ -15,7 +15,7 @@ type mysqlJobsStorage struct {
 	db *sql.DB
 }
 
-func (m *mysqlJobsStorage) UpdateAssetURL(job jobs.Job, assetURL string) error {
+func (m *mysqlJobsStorage) UpdateAssetURL(job job.Job, assetURL string) error {
 	_, err := m.db.Exec(
 		// language=MySQL
 		`UPDATE jobs SET artifacts_url=? WHERE id=?`,
@@ -28,7 +28,7 @@ func (m *mysqlJobsStorage) UpdateAssetURL(job jobs.Job, assetURL string) error {
 	return nil
 }
 
-func (m *mysqlJobsStorage) GetAssetURLForJob(job jobs.Job) (assetURL string, err error) {
+func (m *mysqlJobsStorage) GetAssetURLForJob(job job.Job) (assetURL string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	result, err := m.db.QueryContext(
@@ -56,7 +56,7 @@ func (m *mysqlJobsStorage) GetAssetURLForJob(job jobs.Job) (assetURL string, err
 	return *url, nil
 }
 
-func (m *mysqlJobsStorage) UpdateJob(job jobs.Job) (err error) {
+func (m *mysqlJobsStorage) UpdateJob(job job.Job) (err error) {
 	if err := m.upsertJob(job); err != nil {
 		return err
 	}
@@ -88,7 +88,7 @@ WHERE
 	return nil
 }
 
-func (m *mysqlJobsStorage) upsertPull(job jobs.Job, pull jobs.Pull) error {
+func (m *mysqlJobsStorage) upsertPull(job job.Job, pull job.Pull) error {
 	_, err := m.db.Exec(
 		// language=MySQL
 		`
@@ -127,7 +127,7 @@ INSERT INTO job_pulls (
 	return nil
 }
 
-func (m *mysqlJobsStorage) upsertJob(job jobs.Job) (err error) {
+func (m *mysqlJobsStorage) upsertJob(job job.Job) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	_, err = m.db.ExecContext(
@@ -182,7 +182,7 @@ INSERT INTO jobs (
 	return nil
 }
 
-func (m *mysqlJobsStorage) GetJob(id string) (job jobs.Job, err error) {
+func (m *mysqlJobsStorage) GetJob(id string) (job job.Job, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	var result *sql.Rows
@@ -211,15 +211,15 @@ LIMIT 1`,
 		id,
 	)
 	if err != nil {
-		return jobs.Job{}, err
+		return job.Job{}, err
 	}
 	defer func() {
 		_ = result.Close()
 	}()
 	if !result.Next() {
-		return jobs.Job{}, storage.ErrJobNotFound
+		return job.Job{}, storage.ErrJobNotFound
 	}
-	job = jobs.Job{}
+	job = job.Job{}
 	var startTime []uint8
 	var pendingTime []uint8
 	var completionTime []uint8
@@ -240,28 +240,28 @@ LIMIT 1`,
 		&job.GitBaseLink,
 	)
 	if err != nil {
-		return jobs.Job{}, fmt.Errorf("failed to fetch job row (%w)", err)
+		return job.Job{}, fmt.Errorf("failed to fetch job row (%w)", err)
 	}
 	if job.StartTime, err = m.decodeTime(startTime); err != nil {
-		return jobs.Job{}, err
+		return job.Job{}, err
 	}
 	if job.PendingTime, err = m.decodeTime(pendingTime); err != nil {
-		return jobs.Job{}, err
+		return job.Job{}, err
 	}
 	if job.CompletionTime, err = m.decodeTime(completionTime); err != nil {
-		return jobs.Job{}, err
+		return job.Job{}, err
 	}
 
 	pulls, err := m.getJobPulls(job.ID)
 	if err != nil {
-		return jobs.Job{}, err
+		return job.Job{}, err
 	}
 	job.Pulls = pulls
 	return job, nil
 }
 
-func (m *mysqlJobsStorage) ListJobs(params storage.ListJobsParams) (jobList []jobs.Job, err error) {
-	jobList = []jobs.Job{}
+func (m *mysqlJobsStorage) ListJobs(params storage.ListJobsParams) (jobList []job.Job, err error) {
+	jobList = []job.Job{}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	where := ""
@@ -347,7 +347,7 @@ FROM jobs`+where+` ORDER BY jobs.start_time DESC`+limit,
 		if !result.Next() {
 			break
 		}
-		job := jobs.Job{}
+		job := job.Job{}
 		var startTime []uint8
 		var pendingTime []uint8
 		var completionTime []uint8
@@ -390,7 +390,7 @@ FROM jobs`+where+` ORDER BY jobs.start_time DESC`+limit,
 	return jobList, nil
 }
 
-func (m *mysqlJobsStorage) getJobPulls(jobID string) ([]jobs.Pull, error) {
+func (m *mysqlJobsStorage) getJobPulls(jobID string) ([]job.Pull, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	// TODO work around N+1 queries
@@ -414,13 +414,13 @@ WHERE job_id = ?
 	}()
 	// We explicitly want this to be an empty slice.
 	//goland:noinspection GoPreferNilSlice
-	pulls := []jobs.Pull{}
+	pulls := []job.Pull{}
 	for {
 		if !pullsResult.Next() {
 			break
 		}
 
-		pull := jobs.Pull{}
+		pull := job.Pull{}
 		err := pullsResult.Scan(
 			&pull.Number,
 			&pull.Author,

@@ -28,13 +28,13 @@ type JobsStorage interface {
 	common.ShutdownHandler
 
 	// UpdateJob updates the data on a single job.
-	UpdateJob(job jobs.Job) (err error)
+	UpdateJob(job job.Job) (err error)
 
 	// ListJobs lists all jobs.
-	ListJobs(ListJobsParams) ([]jobs.Job, error)
+	ListJobs(ListJobsParams) ([]job.Job, error)
 
 	// GetJob returns a single job.
-	GetJob(id string) (jobs.Job, error)
+	GetJob(id string) (job.Job, error)
 }
 
 // ErrJobHasNoAssetURL is an error that indicates that the specified job has no stored asset URL and the asset URL should
@@ -46,11 +46,11 @@ type JobsAssetURLStorage interface {
 	common.ShutdownHandler
 
 	// UpdateAssetURL sets the assetURL to the specified value for a job.
-	UpdateAssetURL(job jobs.Job, assetURL string) error
+	UpdateAssetURL(job job.Job, assetURL string) error
 
 	// GetAssetURLForJob returns the asset URL for a job if present or a ErrJobHasNoAssetURL if not found. It can also
 	// return other errors if the fetch failed.
-	GetAssetURLForJob(job jobs.Job) (assetURL string, err error)
+	GetAssetURLForJob(job job.Job) (assetURL string, err error)
 }
 
 // CompoundJobsStorage combines the JobsStorage and the JobsAssetURLStorage

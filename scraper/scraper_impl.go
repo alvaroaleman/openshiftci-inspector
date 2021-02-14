@@ -77,7 +77,7 @@ func (p *scraperImpl) Shutdown(_ context.Context) {
 	p.cancelRunContext()
 }
 
-func (p *scraperImpl) indexJob(job jobs.Job) {
+func (p *scraperImpl) indexJob(job job.Job) {
 	if err := p.jobsStorage.UpdateJob(job); err != nil {
 		p.logger.Printf("\nError while updating job (%v)\033[F", err)
 		return

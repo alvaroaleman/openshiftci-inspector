@@ -9,5 +9,5 @@ import (
 type AssetIndexer interface {
 	// GetMissingAssets is a processor that checks which assets are present for a job, triggers the
 	// retrieval, and then emits a list of assets for a job.
-	GetMissingAssets(job jobs.JobWithAssetURL) ([]asset.AssetWithJob, error)
+	GetMissingAssets(job job.JobWithAssetURL) ([]asset.AssetWithJob, error)
 }

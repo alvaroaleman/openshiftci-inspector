@@ -1,4 +1,4 @@
-package jobs
+package job
 
 // Pull is a pull request for a Job.
 //

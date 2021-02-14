@@ -84,7 +84,7 @@ func (j *jobsGetPreviousAPI) Handle(apiRequest api.Request, response api.Respons
 		return err
 	}
 	if jobList == nil {
-		jobList = []jobs.Job{}
+		jobList = []job.Job{}
 	}
 	return response.Encode(JobsListResponseBody{
 		Jobs: jobList,

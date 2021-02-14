@@ -1,4 +1,4 @@
-package jobs
+package job
 
 // JobWithAssetURL is a job with an already-scraped asset URL.
 //

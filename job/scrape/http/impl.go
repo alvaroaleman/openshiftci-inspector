@@ -16,7 +16,7 @@ type httpJobsScraper struct {
 	logger     *log.Logger
 }
 
-func (h *httpJobsScraper) Scrape() ([]jobs.Job, error) {
+func (h *httpJobsScraper) Scrape() ([]job.Job, error) {
 	url := h.baseURL + "/prowjobs.js?var=allBuilds"
 	data, err := h.httpClient.Get(url)
 	if err != nil {
@@ -40,7 +40,7 @@ func (h *httpJobsScraper) Scrape() ([]jobs.Job, error) {
 	}
 
 	i := 0
-	var jobList []jobs.Job
+	var jobList []job.Job
 	for _, rawJob := range list.Items {
 		i++
 		jobNameSafe := ""
@@ -51,7 +51,7 @@ func (h *httpJobsScraper) Scrape() ([]jobs.Job, error) {
 				}
 			}
 		}
-		job := jobs.Job{
+		job := job.Job{
 			ID:             rawJob.Metadata.UID,
 			Job:            rawJob.Spec.Job,
 			JobSafeName:    jobNameSafe,
@@ -66,10 +66,10 @@ func (h *httpJobsScraper) Scrape() ([]jobs.Job, error) {
 			GitBaseRef:     rawJob.Spec.Refs.BaseRef,
 			GitBaseSHA:     rawJob.Spec.Refs.BaseSha,
 			GitBaseLink:    rawJob.Spec.Refs.BaseLink,
-			Pulls:          []jobs.Pull{},
+			Pulls:          []job.Pull{},
 		}
 		for _, p := range rawJob.Spec.Refs.Pulls {
-			job.Pulls = append(job.Pulls, jobs.Pull{
+			job.Pulls = append(job.Pulls, job.Pull{
 				Number:     p.Number,
 				Author:     p.Author,
 				SHA:        p.SHA,

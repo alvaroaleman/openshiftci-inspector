@@ -64,7 +64,7 @@ func (j *jobsGetAPI) Handle(apiRequest api.Request, response api.Response) error
 	}
 	return response.Encode(
 		SingleJobResponseBody{
-			Job: jobs.JobWithAssetURL{
+			Job: job.JobWithAssetURL{
 				Job:      job,
 				AssetURL: assetURL,
 			},

@@ -19,5 +19,5 @@ type JobsListResponseBody struct {
 	// Jobs is the list of jobs in the response
 	//
 	// required: true
-	Jobs []jobs.Job `json:"jobs"`
+	Jobs []job.Job `json:"jobs"`
 }
