@@ -8,6 +8,7 @@ require (
 	github.com/gorilla/mux v1.7.3
 	github.com/prometheus/client_golang v1.7.1
 	github.com/prometheus/prometheus v1.0.0
+	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208
 	k8s.io/api v0.20.0
 )
 

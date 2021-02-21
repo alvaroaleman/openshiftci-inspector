@@ -73,6 +73,8 @@ func NewMySQLJobsStorage(config mysql.Config) (storage.CompoundJobsStorage, erro
 		return nil, fmt.Errorf("failed to create job_pulls table (%w)", err)
 	}
 
+	db.SetMaxOpenConns(50)
+
 	return &mysqlJobsStorage{
 		db: db,
 	}, nil

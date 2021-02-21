@@ -102,7 +102,7 @@ INSERT INTO job_pulls (
     author_link
 ) VALUES (
 	?, ?, ?, ?, ?, ?, ?
-) ON DUPLICATE KEY UPDATE 
+) ON DUPLICATE KEY UPDATE
 	author = ?,
     sha = ?,
     pull_link = ?,
@@ -152,7 +152,7 @@ INSERT INTO jobs (
 ) VALUES (
     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 ) ON DUPLICATE KEY UPDATE
-    status = ?, 
+    status = ?,
     start_time = ?,
     pending_time = ?,
     completion_time = ?`,

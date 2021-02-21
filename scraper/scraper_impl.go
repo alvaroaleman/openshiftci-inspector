@@ -4,7 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
 	"time"
+
+	"golang.org/x/sync/semaphore"
 
 	"github.com/janoszen/openshiftci_inspector/asset/downloader"
 	"github.com/janoszen/openshiftci_inspector/asset/index"
@@ -35,21 +38,32 @@ loop:
 			p.logger.Printf("Failed to scrape Prow (%v)", err)
 		} else {
 			totalJobs := len(jobsList)
-			completeJobs := 0
+			var lock sync.Mutex
+			var completeJobs int
+			// Matches our db connection
+			sem := semaphore.NewWeighted(50)
 			for _, job := range jobsList {
 				j := job
-				completeJobs++
 
-				p.indexJob(j)
-
-				printCompletionPercentage(completeJobs, totalJobs)
+				if err := sem.Acquire(p.runContext, 1); err != nil {
+					break loop
+				}
+				go func() {
+					defer sem.Release(1)
+					p.indexJob(j)
+					lock.Lock()
+					defer lock.Unlock()
+					completeJobs++
+					printCompletionPercentage(completeJobs, totalJobs)
+				}()
 
 				select {
 				case <-p.runContext.Done():
-					break
+					break loop
 				default:
 				}
 			}
+			sem.Acquire(p.runContext, 50)
 		}
 
 		select {
